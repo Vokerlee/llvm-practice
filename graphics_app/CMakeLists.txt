@@ -9,7 +9,10 @@ pkg_check_modules(GTK REQUIRED gtk4)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -Werror -Wshadow")
 
-add_executable(graph_app main.c)
+add_library(sgl sgl/sgl.c)
+target_link_libraries     (sgl PRIVATE ${GTK_LIBRARIES})
+target_include_directories(sgl PRIVATE ${GTK_INCLUDE_DIRS})
 
-target_link_libraries     (graph_app PRIVATE ${GTK_LIBRARIES})
-target_include_directories(graph_app PRIVATE ${GTK_INCLUDE_DIRS})
+add_executable(graph_app main.c)
+target_link_libraries(graph_app PUBLIC sgl)
+target_include_directories(graph_app PRIVATE sgl)
