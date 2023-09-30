@@ -2,8 +2,8 @@
 
 #include <cairo.h>
 #include <gtk/gtk.h>
-#include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 static void activate(GtkApplication *app, gpointer user_data);
 static void close_window(GtkWidget *widget, gpointer user_data);
@@ -16,9 +16,13 @@ struct sgl_window_info
 
     GtkApplication *app;
 
-    unsigned char *pixels;
+    unsigned char *pixels_old;
+    unsigned char *pixels_new;
 
-    void (*draw_func)(unsigned char *, int, int);
+    int initialized;
+
+    void (*init_func)(unsigned char *, unsigned char *, int, int);
+    void (*draw_func)(unsigned char *, unsigned char *, int, int);
 };
 
 sgl_window_info_t *sgl_get_window_info()
@@ -26,12 +30,20 @@ sgl_window_info_t *sgl_get_window_info()
     return calloc(1, sizeof(sgl_window_info_t));
 }
 
-int sgl_set_draw_func(sgl_window_info_t *win_info, void (*draw_func)(unsigned char *, int, int))
+int sgl_set_draw_func(sgl_window_info_t *win_info, void (*draw_func)(unsigned char *, unsigned char *, int, int))
 {
     if (win_info == NULL)
         return -1;
 
     win_info->draw_func = draw_func;
+}
+
+int sgl_set_init_func(sgl_window_info_t *win_info, void (*init_func)(unsigned char *, unsigned char *, int, int))
+{
+    if (win_info == NULL)
+        return -1;
+
+    win_info->init_func = init_func;
 }
 
 int sgl_set_window_width(sgl_window_info_t *win_info, int width)
@@ -67,9 +79,15 @@ int sgl_set_window_size(sgl_window_info_t *win_info, int width, int height)
 
 int sgl_initialize(sgl_window_info_t *win_info, int argc, char *argv[])
 {
-    win_info->pixels = calloc(win_info->width * win_info->height * 4, sizeof(unsigned char));
-    if (win_info->pixels == NULL)
+    win_info->pixels_old = calloc(win_info->width * win_info->height * 4, sizeof(unsigned char));
+    if (win_info->pixels_old == NULL)
         return -1;
+
+    win_info->pixels_new = calloc(win_info->width * win_info->height * 4, sizeof(unsigned char));
+    if (win_info->pixels_new == NULL)
+        return -1;
+
+    win_info->initialized = 0;
 
     win_info->app = gtk_application_new("graph.app", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(win_info->app, "activate", G_CALLBACK(activate), win_info);
@@ -79,7 +97,8 @@ int sgl_initialize(sgl_window_info_t *win_info, int argc, char *argv[])
 
 int sgl_close(sgl_window_info_t *win_info)
 {
-    free(win_info->pixels);
+    free(win_info->pixels_old);
+    free(win_info->pixels_new);
     g_object_unref(win_info->app);
 
     free(win_info);
@@ -91,9 +110,18 @@ void draw_callback(GtkDrawingArea *drawing_area, cairo_t *cr, int width, int hei
 {
     sgl_window_info_t *win_info = (sgl_window_info_t *) data;
 
-    win_info->draw_func(win_info->pixels, width, height);
+    if (win_info->initialized != 0 && win_info->draw_func != NULL)
+        win_info->draw_func(win_info->pixels_old, win_info->pixels_new, width, height);
+    else if (win_info->init_func != NULL)
+    {
+        win_info->init_func(win_info->pixels_old, win_info->pixels_new, width, height);
+        win_info->initialized = 1;
+    }
 
-    cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) win_info->pixels, CAIRO_FORMAT_ARGB32, width, height, width * 4);
+    cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) win_info->pixels_new,
+                                                                   CAIRO_FORMAT_ARGB32, width, height, width * 4);
+
+    memcpy(win_info->pixels_old, win_info->pixels_new, width * height * 4);
 
     cairo_set_source_surface(cr, surface, 0, 0);
     cairo_surface_flush(surface);
@@ -142,4 +170,14 @@ static void activate(GtkApplication *app, gpointer data)
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area), draw_callback, win_info, NULL);
 
     gtk_window_present(GTK_WINDOW(window));
+}
+
+int sgl_rand()
+{
+    return rand();
+}
+
+void sgl_srand(int seed)
+{
+    srand(seed);
 }
