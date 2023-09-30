@@ -1,6 +1,8 @@
 #ifndef SGL_INCLUDE_SGL_INCLUDE
 #define SGL_INCLUDE_SGL_INCLUDE
 
+#include "sgl_rand.h"
+
 #define SGL_WIDTH_DEFAULT  1080
 #define SGL_HEIGHT_DEFAULT 720
 
