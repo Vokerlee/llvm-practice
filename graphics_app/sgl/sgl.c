@@ -15,6 +15,7 @@ struct sgl_window_info
     int height;
 
     GtkApplication *app;
+    const char *window_title;
 
     unsigned char *pixels_old;
     unsigned char *pixels_new;
@@ -28,6 +29,14 @@ struct sgl_window_info
 sgl_window_info_t *sgl_get_window_info()
 {
     return calloc(1, sizeof(sgl_window_info_t));
+}
+
+int sgl_set_window_title(sgl_window_info_t *win_info, const char *window_title)
+{
+    if (win_info == NULL)
+        return -1;
+
+    win_info->window_title = window_title;
 }
 
 int sgl_set_draw_func(sgl_window_info_t *win_info, void (*draw_func)(unsigned char *, unsigned char *, int, int))
@@ -155,7 +164,11 @@ static void activate(GtkApplication *app, gpointer data)
     sgl_window_info_t *win_info = (sgl_window_info_t *) data;
 
     GtkWidget *window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "Graphics app");
+    if (win_info->window_title != NULL)
+        gtk_window_set_title(GTK_WINDOW(window), win_info->window_title);
+    else
+        gtk_window_set_title(GTK_WINDOW(window), "Application");
+
     gtk_window_set_default_size(GTK_WINDOW(window), win_info->width, win_info->height);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 

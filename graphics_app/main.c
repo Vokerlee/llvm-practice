@@ -1,4 +1,4 @@
-#include "sgl.h"
+#include "sgl/sgl.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 {
     sgl_window_info_t *win_info = sgl_get_window_info();
     sgl_set_window_size(win_info, SGL_WIDTH_DEFAULT, SGL_HEIGHT_DEFAULT);
+    sgl_set_window_title(win_info, "Game of life");
+
     sgl_set_init_func(win_info, init_func);
     sgl_set_draw_func(win_info, draw_func);
 

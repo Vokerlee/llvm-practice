@@ -15,4 +15,3 @@ target_include_directories(sgl PRIVATE ${GTK_INCLUDE_DIRS})
 
 add_executable(graph_app main.c gameoflife.c)
 target_link_libraries(graph_app PUBLIC sgl)
-target_include_directories(graph_app PRIVATE sgl)

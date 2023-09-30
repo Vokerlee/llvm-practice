@@ -1,4 +1,4 @@
-#include "sgl_rand.h"
+#include "sgl/sgl_rand.h"
 
 void init_func(unsigned char *pixels_old, unsigned char *pixels_new, int width, int height)
 {
