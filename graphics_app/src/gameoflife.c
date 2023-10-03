@@ -21,8 +21,6 @@ void init_func(unsigned char *pixels_old, unsigned char *pixels_new, int width, 
 
 void draw_func(unsigned char *pixels_old, unsigned char *pixels_new, int width, int height)
 {
-    static int n_generations = 0;
-
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
