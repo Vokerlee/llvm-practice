@@ -20,15 +20,28 @@ int sgl_initialize()
         return -1;
     }
 
-    SDL_CreateWindowAndRenderer(SGL_WIDTH_DEFAULT, SGL_HEIGHT_DEFAULT, 0, &WINDOW, &RENDERER);
-    SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 0);
+    WINDOW = SDL_CreateWindow("Game of life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SGL_WIDTH_DEFAULT, SGL_HEIGHT_DEFAULT, 0);
+    if (WINDOW == NULL)
+    {
+        fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
+        return -1;
+    }
+
+    RENDERER = SDL_CreateRenderer(WINDOW, -1, SDL_RENDERER_ACCELERATED);
+    if (RENDERER == NULL)
+    {
+        fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
+        return -1;
+    }
 
     TEXTURE = SDL_CreateTexture(RENDERER, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SGL_WIDTH_DEFAULT, SGL_HEIGHT_DEFAULT);
-    if (TEXTURE == NULL) {
+    if (TEXTURE == NULL)
+    {
         fprintf(stderr, "SDL_CreateTexture Error: %s\n", SDL_GetError());
         return -1;
     }
 
+    SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 0);
     SDL_RenderClear(RENDERER);
 
     srand(time(NULL));
