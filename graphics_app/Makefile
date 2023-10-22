@@ -5,7 +5,7 @@ BUILD_DIR = build
 BIN = gameoflife
 
 GR_LIB_NAME = sgl
-GR_APP_LIB_PATH = sdl
+GR_APP_LIB_PATH = gameoflife_sdl
 GR_LIB_FILENAME = lib$(GR_LIB_NAME).a
 GR_APP_SRC_PATH = $(GR_APP_LIB_PATH)/src
 GR_APP_BUILD_PATH = $(GR_APP_LIB_PATH)/$(BUILD_DIR)
