@@ -18,7 +18,7 @@ GR_BASE_LLVM_BC         = $(APP_NAME).bc
 GR_BASE_LLVM_IR         = $(APP_NAME).ll
 
 GR_BASE_LLVM_IR_PATCHED = $(APP_NAME)_patched.ll
-GR_APP_PATCHED          = $(APP_NAME)_patched]
+GR_APP_PATCHED          = $(APP_NAME)_patched
 GR_APP_TRACE_FILENAME   = $(APP_NAME).trace
 
 GR_SOURCES              = $(GR_BASE_SOURCES) $(GR_OTHER_SOURCES)
