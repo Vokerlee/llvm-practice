@@ -22,4 +22,4 @@ $(BIN): $(OBJECTS)
 	$(CC) $^ -O2 -fPIC -c -o $(BUILD_DIR)/$@
 
 clean:
-	rm -rf *.o $(BUILD_DIR)/*.o
+	rm -rf *.o *.so $(BUILD_DIR)
