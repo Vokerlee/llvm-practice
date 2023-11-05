@@ -30,7 +30,8 @@ $(GR_BASE_LLVM_IR): $(GR_IR_GEN_APP)
 $(GR_IR_GEN_APP):
 	mkdir -p $(BUILD_DIR)
 
-	$(CC) -I$(GR_APP_LIB_PATH) -O2 -lLLVM -lSDL2 $(GR_APP_BUILD_PATH)/$(GR_LIB_FILENAME) $(GR_IR_GEN_SRC) -o $(BUILD_DIR)/$@
+	$(CC) -I$(GR_APP_LIB_PATH) -O2 $(GR_IR_GEN_SRC) -c -o $(BUILD_DIR)/$@.o
+	$(CC) -lLLVM -lSDL2 $(BUILD_DIR)/$@.o $(GR_APP_BUILD_PATH)/$(GR_LIB_FILENAME) -o $(BUILD_DIR)/$@
 
 clean:
 	rm -rf *.o $(BUILD_DIR) *.trace

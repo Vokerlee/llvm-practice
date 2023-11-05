@@ -1,4 +1,4 @@
-#include "sgl/sgl.h"
+#include "sgl/sgl.hpp"
 #include "llvm_ir_gen_macros.h"
 
 #include <vector>
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
     Value *zextRes8  = builder.CreateZExt(uremRes4, Type::getInt64Ty(context), "");
 
     Value *gepInst5  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes3, zextRes8);
-    PUT_LOAD_32(loadRes2, gepInst4);
+    PUT_LOAD_32(loadRes2, gepInst5);
 
     Value *icmpRes6  = builder.CreateICmpUGT(loadRes2, GET_INT32(16777215, false), "");
     Value *zextRes9  = builder.CreateZExt(icmpRes6, Type::getInt32Ty(context), "");
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
     Value *uremRes6  = builder.CreateURem(addRes13, GET_INT32(SGL_WIDTH_DEFAULT, false), "");
     Value *zextRes12 = builder.CreateZExt(uremRes6, Type::getInt64Ty(context), "");
 
-    Value *gepInst7  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes3, zextRes12);
+    Value *gepInst7  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes4, zextRes12);
     PUT_LOAD_32(loadRes4, gepInst7);
 
     Value *icmpRes8  = builder.CreateICmpUGT(loadRes4, GET_INT32(16777215, false), "");
@@ -245,28 +245,28 @@ int main(int argc, char *argv[])
     Value *uremRes7  = builder.CreateURem(addRes15, GET_INT32(SGL_WIDTH_DEFAULT, false), "");
     Value *zextRes14 = builder.CreateZExt(uremRes7, Type::getInt64Ty(context), "");
 
-    Value *gepInst8  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes3, zextRes14);
+    Value *gepInst8  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes4, zextRes14);
     PUT_LOAD_32(loadRes5, gepInst8);
 
     Value *icmpRes9   = builder.CreateICmpUGT(loadRes5, GET_INT32(16777215, false), "");
     Value *zextRes15  = builder.CreateZExt(icmpRes9, Type::getInt32Ty(context), "");
     PUT_ADD_NUW_NSW(addRes16, addRes14, zextRes15);
     Value *truncRes10 = builder.CreateTrunc(phiNode6, Type::getInt32Ty(context), "");
-    Value *addRes17   = builder.CreateAdd(truncRes10, GET_INT32(SGL_WIDTH_DEFAULT + 1, false), "");
+    Value *addRes17   = builder.CreateAdd(truncRes10, GET_INT32(SGL_WIDTH_DEFAULT - 1, false), "");
     Value *uremRes8   = builder.CreateURem(addRes17, GET_INT32(SGL_WIDTH_DEFAULT, false), "");
     Value *zextRes16  = builder.CreateZExt(uremRes8, Type::getInt64Ty(context), "");
 
-    Value *gepInst9   = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes3, zextRes16);
+    Value *gepInst9   = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes5, zextRes16);
     PUT_LOAD_32(loadRes6, gepInst9);
 
     Value *icmpRes10  = builder.CreateICmpUGT(loadRes6, GET_INT32(16777215, false), "");
     Value *zextRes17  = builder.CreateZExt(icmpRes10, Type::getInt32Ty(context), "");
     PUT_ADD_NUW_NSW(addRes18, addRes16, zextRes17);
-    Value *truncRes11 = builder.CreateTrunc(phiNode6, Type::getInt32Ty(context), "");
+    Value *truncRes11 = builder.CreateTrunc(addRes8, Type::getInt32Ty(context), "");
     Value *uremRes9   = builder.CreateURem(truncRes11, GET_INT32(SGL_WIDTH_DEFAULT, false), "");
     Value *zextRes18  = builder.CreateZExt(uremRes9, Type::getInt64Ty(context), "");
 
-    Value *gepInst10  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes3, zextRes18);
+    Value *gepInst10  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes5, zextRes18);
     PUT_LOAD_32(loadRes7, gepInst10);
 
     Value *icmpRes11  = builder.CreateICmpUGT(loadRes7, GET_INT32(16777215, false), "");
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
     Value *uremRes10  = builder.CreateURem(addRes20, GET_INT32(SGL_WIDTH_DEFAULT, false), "");
     Value *zextRes20  = builder.CreateZExt(uremRes10, Type::getInt64Ty(context), "");
 
-    Value *gepInst11  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes3, zextRes20);
+    Value *gepInst11  = GEP_ELEM(outerArrayType, allocaInst, GET_INT64(0, false), zextRes1, zextRes5, zextRes20);
     PUT_LOAD_32(loadRes8, gepInst11);
 
     Value *icmpRes12  = builder.CreateICmpUGT(loadRes8, GET_INT32(16777215, false), "");
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
     Value *addRes22   = builder.CreateAdd(addRes21, GET_INT32(-4, true), "");
     cast<BinaryOperator>(addRes22)->setHasNoSignedWrap(true);
 
-    Value *icmpRes14  = builder.CreateICmpUGT(addRes22, GET_INT32(-2, true), "");
+    Value *icmpRes14  = builder.CreateICmpULT(addRes22, GET_INT32(-2, true), "");
     Value *selectRes1 = builder.CreateSelect(icmpRes13, icmpRes14, builder.getFalse(), "");
 
     builder.CreateCondBr(selectRes1, BB[11], BB[12]);
@@ -339,35 +339,37 @@ int main(int argc, char *argv[])
     Value *icmpRes17 = builder.CreateICmpEQ(addRes23, GET_INT64(SGL_WIDTH_DEFAULT, false), "");
     builder.CreateCondBr(icmpRes17, BB[9], BB[10]);
 
+    phiNode6->addIncoming(addRes23, BB[15]);
+
 // End
 
     // Dump LLVM IR
     module->print(outs(), nullptr);
 
     // Interpreter of LLVM IR
-    outs() << "Running code...\n";
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
 
-    // ExecutionEngine *ee = EngineBuilder(std::unique_ptr<Module>(module)).create();
-    // ee->InstallLazyFunctionCreator([&](const std::string &fnName) -> void * {
-    //     if (fnName == "simPutPixel")
-    //         return reinterpret_cast<void *>(simPutPixel);
+    ExecutionEngine *ee = EngineBuilder(std::unique_ptr<Module>(module)).create();
+    ee->InstallLazyFunctionCreator([&](const std::string &fnName) -> void * {
+        if (fnName == "sgl_rand")
+            return reinterpret_cast<void *>(sgl_rand);
+        else if (fnName == "sgl_srand")
+            return reinterpret_cast<void *>(sgl_srand);
+        else if (fnName == "sgl_update")
+            return reinterpret_cast<void *>(sgl_update);
 
-    //     if (fnName == "simFlush")
-    //         return reinterpret_cast<void *>(simFlush);
+        return nullptr;
+    });
 
-    //     return nullptr;
-    // });
-    // ee->finalizeObject();
+    ee->finalizeObject();
 
-    // sgl_initialize();
-    // gameoflife_start();
+    sgl_initialize();
 
-    // ArrayRef<GenericValue> noargs;
-    // GenericValue v = ee->runFunction(appFunc, noargs);
-    // outs() << "Code was run.\n";
+    ArrayRef<GenericValue> noargs;
+    GenericValue v = ee->runFunction(gameOfLifeStartFunc, noargs);
 
-    // sgl_close();
+    sgl_close();
+
     return EXIT_SUCCESS;
 }

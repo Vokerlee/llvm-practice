@@ -85,7 +85,6 @@ void sgl_update(int pixel_buffer[SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEFAULT])
     sgl_flush();
 }
 
-
 int sgl_get_pixel(int x, int y)
 {
     assert(0 <= x && x < SGL_WIDTH_DEFAULT  && "Out of range");
