@@ -3,10 +3,11 @@
 ## What this folder contains
 
   * Game of Life is implemented in `GTK4` and `SDL` libraries.
-  * Version with `SDL` implementation is used for trace analyses.
-  * LLVM Logger Pass is implemented (valid for LLVM 16+ versions) for log of each LLVM IR operation for `Game of Life`` logic.
-  * Scripts & Makefiles for trace collection from patched `Game of Life` with LLVM Logger Pass.
-  * All analyses pictures are in `trace_analyses` folder.
+    * Version with `SDL` implementation is used for trace analyses.
+  * LLVM Logger Pass is implemented (valid for LLVM 16+ versions) for log of each LLVM IR operation for `Game of Life` logic.
+    * Scripts & Makefiles for trace collection from patched `Game of Life` with LLVM Logger Pass.
+    * All analyses pictures are in `trace_analyses` folder.
+  * LLVM IR manual generation of `Game of Life` logic with its execution via `llvm::ExecutionEngine`.
 
 ## How to build
 
@@ -32,4 +33,3 @@
     * ```shell
       ./gameoflife_ir_gen/build/gameoflife_ir_gen
       ```
-
