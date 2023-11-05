@@ -9,7 +9,7 @@ OBJECTS := $(SOURCES:.cpp=.o)
 
 BIN := $(SOURCES:.cpp=.so)
 
-all: build clean
+all: build
 
 build: $(BIN)
 

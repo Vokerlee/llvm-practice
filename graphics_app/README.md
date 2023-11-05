@@ -8,27 +8,28 @@
   * Scripts & Makefiles for trace collection from patched `Game of Life` with LLVM Logger Pass.
   * All analyses pictures are in `trace_analyses` folder.
 
-## How to build & launch
+## How to build
 
-  * Build `Game of Life` & launch:
-    * ```shell
-      mkdir -p ./gameoflife_sdl/build && cd ./gameoflife_sdl/build
-      cmake ..
-      make
-      ./gameoflife
-      ```
-  * Build LLVM Logger Pass:
-    * ```shell
-      cd ./llvm_pass_logger
-      make
-      ```
-  * Build patched `Game of Life` with LLVM Logger Pass & launch:
+  * Build everything:
     * ```shell
       make
-      ./build/gameoflife > filename.trace
       ```
-  * Get LLVM IR operations frequency analyses:
+## How to launch
+
+  * Launch `Game of Life`:
     * ```shell
-      python3 trace_analyses/gen_plots.py filename.trace
+      ./gameoflife_sdl/build/gameoflife
+      ```
+  * Launch patched `Game of Life` with LLVM Logger Pass:
+    * ```shell
+      ./gameoflife_trace/build/gameoflife_patched > filename.trace
+      ```
+  * Get LLVM IR operations frequency analyses (from patched `Game of Life`):
+    * ```shell
+      python3 ./gameoflife_trace/trace_analyses/gen_plots.py filename.trace
+      ```
+  * Launch `Game of Life` with manually generated logic in LLVM IR:
+    * ```shell
+      ./gameoflife_ir_gen/build/gameoflife_ir_gen
       ```
 
