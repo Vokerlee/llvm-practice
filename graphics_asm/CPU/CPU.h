@@ -4,8 +4,8 @@
 #include "common/macros.h"
 #include "common/config.h"
 #include "sgl/sgl_minimal.hpp"
-#include "CPU/instruction.h"
 
+#include <cassert>
 #include <vector>
 #include <stack>
 #include <fstream>
@@ -25,6 +25,33 @@ public:
 
     CPU() = default;
     ~CPU() = default;
+
+    Reg GetReg(size_t reg_idx) const
+    {
+        assert(reg_idx < REG_FILE_SIZE);
+        return regs_[reg_idx];
+    }
+
+    void SetReg(size_t reg_idx, Reg reg)
+    {
+        assert(reg_idx < REG_FILE_SIZE);
+        regs_[reg_idx] = reg;
+    }
+
+    Reg GetPC() const
+    {
+        return pc_;
+    }
+
+    void SetPC(Reg pc)
+    {
+        pc_ = pc;
+    }
+
+    void SetPCTarget(Reg pc_target)
+    {
+        pc_target_ = pc_target;
+    }
 
 protected:
     typedef int FrameBuffer[SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEFAULT];
