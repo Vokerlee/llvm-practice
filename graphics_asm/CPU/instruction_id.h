@@ -13,21 +13,21 @@ enum class InstructionId
     EXIT    = 0x0,  // exit
 
     // Register-arithmetic operations
-    ADD     = 0x1,  // add     rd rs1 rs2
-    SUB     = 0x2,  // sub     rd rs1 rs2
-    DIV     = 0x3,  // div     rd rs1 rs2
-    REM     = 0x4,  // rem     rd rs1 rs2
-    AND     = 0x5,  // and     rd rs1 rs2
-    XOR     = 0x6,  // xor     rd rs1 rs2
+    ADDI    = 0x1,  // addi    rd rs1 rs2
+    SUBI    = 0x2,  // subi    rd rs1 rs2
+    DIVI    = 0x3,  // divi    rd rs1 rs2
+    REMI    = 0x4,  // remi    rd rs1 rs2
+    ANDI    = 0x5,  // andi    rd rs1 rs2
+    XORI    = 0x6,  // xori    rd rs1 rs2
     MOV     = 0x7,  // mov     rd rs
-    MOVI    = 0x8,  // and     rd number
+    MOVIMM  = 0x8,  // movimm  rd number
 
     // Conditional operations
     ILT     = 0x10, // ilt     rd rs1 rs2
     IMET    = 0x11, // imet    rd rs1 rs2
     EQ      = 0x12, // eq      rd rs1 rs2
     NEQ     = 0x13, // neq     rd rs1 rs2
-    ISELECT = 0x14, // iselect rd rs1 rs2, rcond
+    SELECT  = 0x14, // select  rd rs1 rs2, rcond
 
     // Graphics-related operations
     SRAND   = 0x20, // srand   rs
@@ -44,10 +44,10 @@ enum class InstructionId
     BLUE    = 0x2a, // blue    rd rs
 
     // Memory operations
-    LW      = 0x30, // lw      rd rs
-    LD      = 0x31, // ld      rd rs
-    SW      = 0x32, // sw      rd rs
-    SD      = 0x33, // sd      rd rs
+    LWI     = 0x30, // lwi     rd rs
+    LDI     = 0x31, // ldi     rd rs
+    SWI     = 0x32, // swi     rd rs
+    SDI     = 0x33, // sdi     rd rs
 
     // Branch operations
     BR      = 0x40, // br      rs

@@ -9,13 +9,13 @@
 namespace grasm
 {
 
-class Parser
+class Lexer
 {
 public:
-    NO_COPY_SEMANTIC(Parser);
-    NO_MOVE_SEMANTIC(Parser);
+    NO_COPY_SEMANTIC(Lexer);
+    NO_MOVE_SEMANTIC(Lexer);
 
-    Parser(const char *filename)
+    Lexer(const char *filename)
     {
         asm_file_.open(filename);
         if (!asm_file_.is_open())
@@ -24,7 +24,7 @@ public:
         }
     }
 
-    ~Parser()
+    ~Lexer()
     {
         asm_file_.close();
     }
@@ -36,7 +36,7 @@ public:
     }
 
     template <typename T>
-    Parser &GetNext(T &field)
+    Lexer &GetNext(T &field)
     {
         asm_file_ >> field;
         return *this;

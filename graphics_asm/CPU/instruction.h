@@ -14,7 +14,7 @@ namespace grasm
 class Instruction
 {
 public:
-    typedef void (*InstrImpl)(CPU *, const Instruction &);
+    typedef void (*InstrImpl)(CPU *cpu, const Instruction &instr);
 
     struct Attrs
     {
@@ -35,6 +35,16 @@ public:
         impl_(impl),
         mnemonic_(mnemonic)
     {}
+
+    Attrs GetAttrs() const
+    {
+        return attributes_;
+    }
+
+    std::string GetMnemonic() const
+    {
+        return mnemonic_;
+    }
 
     ~Instruction() = default;
 
