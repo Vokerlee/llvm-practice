@@ -33,9 +33,9 @@ enum class InsnId
     SRAND   = 0x20, // srand   src
     RAND    = 0x21, // rand    dst
     CF      = 0x22, // cf      dst
-    GR      = 0x23, // gr      dst src
+    GR      = 0x23, // gr      dst src1 src2
     GPR     = 0x24, // gpr     dst src1 src2
-    GP      = 0x25, // gp      dst src1 src2
+    GP      = 0x25, // gp      dst src1 src2 src3
     FLUSH   = 0x26, // flush   src
 
     RGB     = 0x27, // rgb     dst red green blue
@@ -52,6 +52,7 @@ enum class InsnId
     // Branch operations
     BR      = 0x40, // br      src
     BRIF    = 0x41, // brif    cond src1 src2
+    CALL    = 0x42,
 };
 
 }; // grasm
