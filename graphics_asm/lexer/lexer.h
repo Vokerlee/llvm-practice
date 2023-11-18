@@ -1,5 +1,5 @@
-#ifndef GRASM_PARSER_H
-#define GRASM_PARSER_H
+#ifndef GRASM_LEXER_H
+#define GRASM_LEXER_H
 
 #include "common/macros.h"
 
@@ -20,8 +20,7 @@ public:
         asm_file_.open(filename);
         if (!asm_file_.is_open())
         {
-            // llvm::errs << "Error: can't open \"" << filename << "\"\n";
-            llvm::errs() << "Error: can't open \"\n";
+            llvm::errs() << "Error: can't open \"" << filename << "\"\n";
         }
     }
 
@@ -54,4 +53,4 @@ private:
 
 }; // grasm
 
-#endif // GRASM_PARSER_H
+#endif // GRASM_LEXER_H
