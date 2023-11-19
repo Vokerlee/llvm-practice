@@ -9,6 +9,8 @@ namespace grasm
 
 enum class InstructionId
 {
+    LABEL   = 0xff,
+
     // General operations
     EXIT    = 0x0,  // exit
 
@@ -51,8 +53,8 @@ enum class InstructionId
     SDI     = 0x33, // sdi     rd rs
 
     // Branch operations
-    BR      = 0x40, // br      rs
-    BRIF    = 0x41, // brif    rcond rs1 rs2
+    BR      = 0x40, // br      label
+    BRIF    = 0x41, // brif    rcond label
     CALL    = 0x42,
 };
 

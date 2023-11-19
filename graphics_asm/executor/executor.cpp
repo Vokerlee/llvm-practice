@@ -10,40 +10,35 @@ bool Executor::ParseAsmFile(const char *filename)
     if (!lexer.IsValid())
         return false;
 
-    std::string label;
-
-    // Fulfill all labels
-    while (lexer.IsValid() == true)
-    {
-        lexer.GetNext(label);
-        if (!label.substr(label.size() - 1, label.size() - 1).compare(":"))
-        {
-            std::string label_name = label.substr(0, label.size() - 1);
-            llvm::outs() << "label " << label_name << "\n";
-            bb_map_[label_name] = llvm::BasicBlock::Create(context_, label_name, main_func_);
-        }
-    }
-
     std::string arg1;
     std::string arg2;
     std::string arg3;
     std::string arg4;
 
-    lexer.ResetToStart();
-
     while (lexer.IsValid() == true)
     {
+        Instruction::Attrs attrs {};
         std::string mnemonic;
+
         lexer.GetNext(mnemonic);
         if (!mnemonic.compare(""))
             break;
 
         // That is just a label
         if (!mnemonic.substr(mnemonic.size() - 1, mnemonic.size() - 1).compare(":"))
+        {
+            std::string label_name = mnemonic.substr(0, mnemonic.size() - 1);
+            llvm::outs() << "label " << label_name << "\n";
+
+            bb_map_[label_name] = llvm::BasicBlock::Create(context_, label_name, main_func_);
+
+            attrs.label = label_name;
+            instrs_.push_back(Instruction(InstructionId::LABEL, attrs, nullptr, label_name));
+
             continue;
+        }
 
         llvm::outs() << mnemonic << "\n";
-        Instruction::Attrs attrs {};
 
         if (!mnemonic.compare("exit"))
             instrs_.push_back(Instruction(InstructionId::EXIT, attrs, exec::exit, "exit"));
@@ -104,8 +99,7 @@ bool Executor::ParseAsmFile(const char *filename)
         {
             lexer.GetNext(arg1).GetNext(arg2).GetNext(arg3);
             attrs.rs1 = stoi(arg1.substr(1));
-            attrs.rs2 = stoi(arg2.substr(1));
-            attrs.rs3 = stoi(arg3.substr(1));
+            attrs.label = arg2;
 
             if (!mnemonic.compare("brif"))
                 instrs_.push_back(Instruction(InstructionId::BRIF, attrs, exec::brif, "brif"));
@@ -144,7 +138,7 @@ bool Executor::ParseAsmFile(const char *filename)
             if (!mnemonic.compare("movimm"))
                 instrs_.push_back(Instruction(InstructionId::MOVIMM, attrs, exec::movimm, "movimm"));
         }
-        else if (!mnemonic.compare("srand") || !mnemonic.compare("flush") || !mnemonic.compare("br"))
+        else if (!mnemonic.compare("srand") || !mnemonic.compare("flush"))
         {
             lexer.GetNext(arg1);
             attrs.rs1 = stoi(arg1.substr(1));
@@ -153,8 +147,14 @@ bool Executor::ParseAsmFile(const char *filename)
                 instrs_.push_back(Instruction(InstructionId::SRAND, attrs, exec::srand, "srand"));
             else if (!mnemonic.compare("flush"))
                 instrs_.push_back(Instruction(InstructionId::FLUSH, attrs, exec::flush, "flush"));
-            else if (!mnemonic.compare("br"))
-                instrs_.push_back(Instruction(InstructionId::BR,    attrs, exec::br,    "br"));
+        }
+        else if (!mnemonic.compare("br"))
+        {
+            lexer.GetNext(arg1);
+            attrs.label = arg1;
+
+            if (!mnemonic.compare("br"))
+                instrs_.push_back(Instruction(InstructionId::BR, attrs, exec::br, "br"));
         }
         else if (!mnemonic.compare("cf") || !mnemonic.compare("rand"))
         {
@@ -173,16 +173,51 @@ bool Executor::ParseAsmFile(const char *filename)
 
 bool Executor::Execute()
 {
-    if (instrs_.size() == 0)
-    {
-        llvm::errs() << "Nothing to execute\n";
-        return false;
-    }
-
-    llvm::outs() << "size is " << instrs_.size() << "\n";
-
     llvm::GlobalVariable *reg_file = module_->getNamedGlobal("reg_file");
     (void) reg_file;
+
+    llvm::FunctionType *instr_call_type = llvm::FunctionType::get(
+        builder_.getVoidTy(),
+        llvm::ArrayRef<llvm::Type *>({builder_.getInt8PtrTy(), builder_.getInt8PtrTy()}),
+        false);
+
+    llvm::Value *cpu_ptr = builder_.getInt64((uint64_t) cpu_);
+
+    if (instrs_[0].GetId() == InstructionId::LABEL)
+        builder_.SetInsertPoint(bb_map_[instrs_[0].GetAttrs().label]);
+    else
+    {
+        builder_.SetInsertPoint(bb_map_["__start"]);
+    }
+
+    for (auto &instr : instrs_)
+    {
+        if (instr.GetId() == InstructionId::LABEL)
+        {
+            builder_.SetInsertPoint(bb_map_[instr.GetAttrs().label]);
+            continue;
+        }
+        if (instr.GetId() == InstructionId::EXIT)
+        {
+            builder_.CreateRetVoid();
+            continue;
+        }
+
+        llvm::Value *instr_ptr = builder_.getInt64((uint64_t) &instr);
+        builder_.CreateCall(module_->getOrInsertFunction(instr.GetMnemonic(), instr_call_type),
+            llvm::ArrayRef<llvm::Value *>({cpu_ptr, instr_ptr}));
+    }
+
+    llvm::outs() << "\n#[LLVM IR]:\n";
+    module_->print(llvm::outs(), nullptr);
+
+    llvm::verifyFunction(*main_func_);
+    llvm::outs() << "\n#[Running code]\n";
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+
+    llvm::ExecutionEngine *ee = llvm::EngineBuilder(std::unique_ptr<llvm::Module>(module_)).create();
+    ee->InstallLazyFunctionCreator(Instruction::LazyFunctionCreator);
 
     return true;
 }

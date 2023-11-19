@@ -17,6 +17,8 @@ namespace grasm
 class CPU
 {
 public:
+    friend class Executor;
+
     static constexpr size_t REG_FILE_SIZE = 0x20;
 
 public:
@@ -48,9 +50,19 @@ public:
         pc_ = pc;
     }
 
+    Reg GetPCTarget() const
+    {
+        return pc_target_;
+    }
+
     void SetPCTarget(Reg pc_target)
     {
         pc_target_ = pc_target;
+    }
+
+    void MakeIdle()
+    {
+        is_idle = true;
     }
 
 protected:
@@ -60,6 +72,8 @@ protected:
     Reg regs_[REG_FILE_SIZE] = {0};
     Reg pc_ {0};
     Reg pc_target_ {0};
+
+    bool is_idle {true};
 
     std::stack<Reg> call_stack_;
     std::vector<FrameBuffer> frames_;

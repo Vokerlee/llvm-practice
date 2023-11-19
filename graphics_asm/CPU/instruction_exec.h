@@ -59,6 +59,7 @@ void brif  (CPU *cpu, const Instruction &instr);
 void call  (CPU *cpu, const Instruction &instr);
 
 }; // exec
+
 }; // grasm
 
 #endif // GRASM_INSTRUCTION_EXEC_H

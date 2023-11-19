@@ -7,8 +7,8 @@ namespace grasm::exec
 
 void exit(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
     (void) instr;
+    cpu->MakeIdle();
 }
 
 void addi(CPU *cpu, const Instruction &instr)

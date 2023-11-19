@@ -18,6 +18,8 @@ public:
 
     struct Attrs
     {
+        std::string label;
+
         Reg imm {0};
         Reg rs1 {0};
         Reg rs2 {0};
@@ -35,20 +37,30 @@ public:
 
     ~Instruction() = default;
 
-    Attrs GetAttrs() const
+    const Attrs &GetAttrs() const
     {
         return attributes_;
     }
 
-    std::string GetMnemonic() const
+    const std::string &GetMnemonic() const
     {
         return mnemonic_;
+    }
+
+    InstructionId GetId() const
+    {
+        return id_;
+    }
+
+    void Execute(CPU *cpu)
+    {
+        impl_(cpu, *this);
     }
 
     static void *LazyFunctionCreator(const std::string &mnemonic);
 
 private:
-    InstructionId id_   {InstructionId::EXIT};
+    InstructionId id_ {InstructionId::EXIT};
     Attrs         attributes_;
     InstrImpl     impl_ {nullptr};
     std::string   mnemonic_;
