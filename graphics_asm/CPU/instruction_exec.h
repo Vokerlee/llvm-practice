@@ -56,7 +56,6 @@ void sdi   (CPU *cpu, const Instruction &instr);
 // Branch operations
 void br    (CPU *cpu, const Instruction &instr);
 void brif  (CPU *cpu, const Instruction &instr);
-void call  (CPU *cpu, const Instruction &instr);
 
 }; // exec
 

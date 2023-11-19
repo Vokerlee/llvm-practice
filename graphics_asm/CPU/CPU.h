@@ -65,6 +65,13 @@ public:
         is_idle = true;
     }
 
+    void DumpRegs() const
+    {
+        llvm::outs() << "Registers' dump:\n";
+        for (size_t i = 0; i < REG_FILE_SIZE; ++i)
+            llvm::outs() << "[Reg #" << i << "]: " << regs_[i] << "\n";
+    }
+
 protected:
     typedef int FrameBuffer[SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEFAULT];
 

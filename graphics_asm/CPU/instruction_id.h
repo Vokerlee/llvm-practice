@@ -54,8 +54,7 @@ enum class InstructionId
 
     // Branch operations
     BR      = 0x40, // br      label
-    BRIF    = 0x41, // brif    rcond label
-    CALL    = 0x42,
+    BRIF    = 0x41, // brif    rcond label1 label2
 };
 
 }; // grasm

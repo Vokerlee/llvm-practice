@@ -19,6 +19,7 @@ public:
     struct Attrs
     {
         std::string label;
+        std::string label_alt;
 
         Reg imm {0};
         Reg rs1 {0};

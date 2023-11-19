@@ -99,7 +99,8 @@ bool Executor::ParseAsmFile(const char *filename)
         {
             lexer.GetNext(arg1).GetNext(arg2).GetNext(arg3);
             attrs.rs1 = stoi(arg1.substr(1));
-            attrs.label = arg2;
+            attrs.label     = arg2;
+            attrs.label_alt = arg3;
 
             if (!mnemonic.compare("brif"))
                 instrs_.push_back(Instruction(InstructionId::BRIF, attrs, exec::brif, "brif"));
@@ -173,8 +174,8 @@ bool Executor::ParseAsmFile(const char *filename)
 
 bool Executor::Execute()
 {
-    llvm::GlobalVariable *reg_file = module_->getNamedGlobal("reg_file");
-    (void) reg_file;
+    std::string error_msg;
+    llvm::raw_string_ostream error_ostream(error_msg);
 
     llvm::FunctionType *instr_call_type = llvm::FunctionType::get(
         builder_.getVoidTy(),
@@ -187,6 +188,7 @@ bool Executor::Execute()
         builder_.SetInsertPoint(bb_map_[instrs_[0].GetAttrs().label]);
     else
     {
+        bb_map_["__start"] = llvm::BasicBlock::Create(context_, "__start", main_func_);
         builder_.SetInsertPoint(bb_map_["__start"]);
     }
 
@@ -197,9 +199,28 @@ bool Executor::Execute()
             builder_.SetInsertPoint(bb_map_[instr.GetAttrs().label]);
             continue;
         }
-        if (instr.GetId() == InstructionId::EXIT)
+        else if (instr.GetId() == InstructionId::EXIT)
         {
             builder_.CreateRetVoid();
+            continue;
+        }
+        else if (instr.GetId() == InstructionId::BR)
+        {
+            builder_.CreateBr(bb_map_[instr.GetAttrs().label]);
+            continue;
+        }
+        else if (instr.GetId() == InstructionId::BRIF)
+        {
+            llvm::Value *val_ptr =
+                builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs1);
+
+            llvm::Value *cond = builder_.CreateICmpEQ(
+                builder_.CreateLoad(builder_.getInt64Ty(), val_ptr),
+                llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), 0, true));
+
+            builder_.CreateCondBr(cond, bb_map_[instr.GetAttrs().label_alt],
+                                        bb_map_[instr.GetAttrs().label]);
+
             continue;
         }
 
@@ -212,12 +233,28 @@ bool Executor::Execute()
     module_->print(llvm::outs(), nullptr);
 
     llvm::verifyFunction(*main_func_);
-    llvm::outs() << "\n#[Running code]\n";
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
 
-    llvm::ExecutionEngine *ee = llvm::EngineBuilder(std::unique_ptr<llvm::Module>(module_)).create();
+    llvm::ExecutionEngine *ee =
+        llvm::EngineBuilder(std::unique_ptr<llvm::Module>(module_)).setErrorStr(&error_msg).create();
+    if (ee == nullptr)
+    {
+        llvm::errs() << "error occured in llvm::EngineBuilder(...).create(): "
+                     << error_msg << "\n";
+        return false;
+    }
+
     ee->InstallLazyFunctionCreator(Instruction::LazyFunctionCreator);
+    ee->addGlobalMapping(reg_file_, (void *) cpu_->regs_);
+    ee->finalizeObject();
+
+    llvm::outs() << "\n#[Running code]\n";
+    llvm::ArrayRef<llvm::GenericValue> noargs;
+    ee->runFunction(main_func_, noargs);
+
+    cpu_->DumpRegs();
 
     return true;
 }

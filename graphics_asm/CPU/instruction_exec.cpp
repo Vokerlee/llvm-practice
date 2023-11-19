@@ -13,85 +13,88 @@ void exit(CPU *cpu, const Instruction &instr)
 
 void addi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) + cpu->GetReg(attrs.rs2));
 }
 
 void subi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) - cpu->GetReg(attrs.rs2));
 }
 
 void muli(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) * cpu->GetReg(attrs.rs2));
 }
 
 void divi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) / cpu->GetReg(attrs.rs2));
 }
 
 void remi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) % cpu->GetReg(attrs.rs2));
 }
 void andi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) & cpu->GetReg(attrs.rs2));
 }
 
 void xori(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) ^ cpu->GetReg(attrs.rs2));
 }
 
 void mov(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1));
 }
 
 void movimm(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, attrs.imm);
 }
 
 void ilt(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) < cpu->GetReg(attrs.rs2));
 }
 
 void imet(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) >= cpu->GetReg(attrs.rs2));
 }
 
 void eq(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) == cpu->GetReg(attrs.rs2));
 }
 
 void neq(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) != cpu->GetReg(attrs.rs2));
 }
 
 void select(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    if (cpu->GetReg(attrs.rs3))
+        cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1));
+    else
+        cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs2));
 }
 
 void srand(CPU *cpu, const Instruction &instr)
@@ -99,6 +102,7 @@ void srand(CPU *cpu, const Instruction &instr)
     (void) cpu;
     (void) instr;
 }
+
 void rand(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
@@ -161,44 +165,42 @@ void blue(CPU *cpu, const Instruction &instr)
 
 void lwi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, *((int *) cpu->GetReg(attrs.rs1)));
 }
 
 void ldi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, *((Reg *) cpu->GetReg(attrs.rs1)));
 }
 
 void swi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    *((int *) cpu->GetReg(attrs.rd)) = cpu->GetReg(attrs.rs1);
 }
 
 void sdi(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    *((Reg *) cpu->GetReg(attrs.rd)) = cpu->GetReg(attrs.rs1);
 }
 
 void br(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
     (void) instr;
+
+    llvm::errs() << "Error: instruction \"br\" is not reachable: its implemenated is in LLVM IR generation\n";
 }
 
 void brif(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
     (void) instr;
-}
 
-void call(CPU *cpu, const Instruction &instr)
-{
-    (void) cpu;
-    (void) instr;
+    llvm::errs() << "Error: instruction \"brif\" is not reachable: its implemenated is in LLVM IR generation\n";
 }
 
 } // grasm::exec
@@ -270,8 +272,6 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::br);
     if (mnemonic == "brif")
         return reinterpret_cast<void *>(exec::brif);
-    if (mnemonic == "call")
-        return reinterpret_cast<void *>(exec::call);
 
     return nullptr;
 }
