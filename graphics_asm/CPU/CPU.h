@@ -21,12 +21,20 @@ public:
 
     static constexpr size_t REG_FILE_SIZE = 0x20;
 
+    typedef int FrameBuffer[SGL_WIDTH_DEFAULT];
+
 public:
     NO_COPY_SEMANTIC(CPU);
     NO_MOVE_SEMANTIC(CPU);
 
     CPU() = default;
-    ~CPU() = default;
+    ~CPU()
+    {
+        for (auto &frame_ptr : frames_)
+        {
+            delete [] frame_ptr;
+        }
+    }
 
     Reg GetReg(size_t reg_idx) const
     {
@@ -72,8 +80,12 @@ public:
             llvm::outs() << "[Reg #" << i << "]: " << regs_[i] << "\n";
     }
 
-protected:
-    typedef int FrameBuffer[SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEFAULT];
+    FrameBuffer *CreateFrame()
+    {
+        FrameBuffer *frame_ptr = new int [SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEFAULT];
+        frames_.push_back(frame_ptr);
+        return frame_ptr;
+    }
 
 protected:
     Reg regs_[REG_FILE_SIZE] = {0};
@@ -83,7 +95,7 @@ protected:
     bool is_idle {true};
 
     std::stack<Reg> call_stack_;
-    std::vector<FrameBuffer> frames_;
+    std::vector<FrameBuffer *> frames_;
 };
 
 }; // grasm

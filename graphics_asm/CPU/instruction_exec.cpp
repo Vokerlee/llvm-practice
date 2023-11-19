@@ -59,7 +59,7 @@ void mov(CPU *cpu, const Instruction &instr)
     cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1));
 }
 
-void movimm(CPU *cpu, const Instruction &instr)
+void mov_imm(CPU *cpu, const Instruction &instr)
 {
     auto attrs = instr.GetAttrs();
     cpu->SetReg(attrs.rd, attrs.imm);
@@ -112,56 +112,86 @@ void rand(CPU *cpu, const Instruction &instr)
 
 void cf(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (Reg) cpu->CreateFrame());
 }
 
 void gr(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) +
+                          sizeof(int) * cpu->GetReg(attrs.rs2) * SGL_WIDTH_DEFAULT);
 }
 
 void gpr(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) + sizeof(int) * cpu->GetReg(attrs.rs2));
 }
 
 void gp(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->GetReg(attrs.rs1) +
+                          sizeof(int) * (cpu->GetReg(attrs.rs2) * SGL_WIDTH_DEFAULT + cpu->GetReg(attrs.rs3)));
 }
 
 void flush(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    sgl_update((CPU::FrameBuffer *) cpu->GetReg(attrs.rs1));
 }
 
 void rgb(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (cpu->GetReg(attrs.rs1) & ((1 << 9) - 1)) +
+                          ((cpu->GetReg(attrs.rs2) & ((1 << 9) - 1)) << 8) +
+                          ((cpu->GetReg(attrs.rs3) & ((1 << 9) - 1)) << 16));
 }
 
 void red(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (cpu->GetReg(attrs.rs1) & ((1 << 9) - 1)));
 }
 
 void green(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (cpu->GetReg(attrs.rs1) & ((1 << 9) - 1)) << 8);
 }
 
 void blue(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (cpu->GetReg(attrs.rs1) & ((1 << 9) - 1)) << 16);
+}
+
+void rgb_imm(CPU *cpu, const Instruction &instr)
+{
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (attrs.imm  & ((1 << 9) - 1)) +
+                          ((attrs.imm2 & ((1 << 9) - 1)) << 8) +
+                          ((attrs.imm3 & ((1 << 9) - 1)) << 16));
+}
+
+void red_imm(CPU *cpu, const Instruction &instr)
+{
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (attrs.imm  & ((1 << 9) - 1)));
+}
+
+void green_imm(CPU *cpu, const Instruction &instr)
+{
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (attrs.imm  & ((1 << 9) - 1)) << 8);
+}
+
+void blue_imm(CPU *cpu, const Instruction &instr)
+{
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, (attrs.imm  & ((1 << 9) - 1)) << 16);
 }
 
 void lwi(CPU *cpu, const Instruction &instr)
@@ -204,6 +234,22 @@ void brif(CPU *cpu, const Instruction &instr)
     llvm::errs() << "Error: instruction \"brif\" is not reachable: its implemenated is in LLVM IR generation\n";
 }
 
+void call(CPU *cpu, const Instruction &instr)
+{
+    (void) cpu;
+    (void) instr;
+
+    llvm::errs() << "Error: instruction \"call\" is not available yet\n";
+}
+
+void ret(CPU *cpu, const Instruction &instr)
+{
+    (void) cpu;
+    (void) instr;
+
+    llvm::errs() << "Error: instruction \"ret\" is not available yet\n";
+}
+
 } // grasm::exec
 
 namespace grasm
@@ -227,8 +273,8 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::xori);
     if (mnemonic == "mov")
         return reinterpret_cast<void *>(exec::mov);
-    if (mnemonic == "movimm")
-        return reinterpret_cast<void *>(exec::movimm);
+    if (mnemonic == "mov_imm")
+        return reinterpret_cast<void *>(exec::mov_imm);
     if (mnemonic == "ilt")
         return reinterpret_cast<void *>(exec::ilt);
     if (mnemonic == "imet")
@@ -261,6 +307,14 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::green);
     if (mnemonic == "blue")
         return reinterpret_cast<void *>(exec::blue);
+    if (mnemonic == "rgb_imm")
+        return reinterpret_cast<void *>(exec::rgb_imm);
+    if (mnemonic == "red_imm")
+        return reinterpret_cast<void *>(exec::red_imm);
+    if (mnemonic == "green_imm")
+        return reinterpret_cast<void *>(exec::green_imm);
+    if (mnemonic == "blue_imm")
+        return reinterpret_cast<void *>(exec::blue_imm);
     if (mnemonic == "lwi")
         return reinterpret_cast<void *>(exec::lwi);
     if (mnemonic == "ldi")
@@ -273,6 +327,10 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::br);
     if (mnemonic == "brif")
         return reinterpret_cast<void *>(exec::brif);
+    if (mnemonic == "call")
+        return reinterpret_cast<void *>(exec::call);
+    if (mnemonic == "ret")
+        return reinterpret_cast<void *>(exec::ret);
 
     return nullptr;
 }

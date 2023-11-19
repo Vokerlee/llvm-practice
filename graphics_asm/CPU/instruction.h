@@ -21,7 +21,10 @@ public:
         std::string label;
         std::string label_alt;
 
-        Reg imm {0};
+        Reg imm  {0};
+        Reg imm2 {0};
+        Reg imm3 {0};
+
         Reg rs1 {0};
         Reg rs2 {0};
         Reg rs3 {0};
