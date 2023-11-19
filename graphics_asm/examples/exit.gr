@@ -1,0 +1,4 @@
+start:
+    br exit
+exit:
+    exit
