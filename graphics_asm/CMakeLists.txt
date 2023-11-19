@@ -8,8 +8,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(GRASM_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(GRASM_BINARY_ROOT ${CMAKE_CURRENT_BINARY_DIR})
 
-set(SGL_INCLUDE_DIRS ${GRASM_ROOT}/../graphics_app/gameoflife_sdl)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -Werror -Wshadow")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
 
@@ -17,6 +15,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${GRASM_BINARY_ROOT}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${GRASM_BINARY_ROOT}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${GRASM_BINARY_ROOT}/bin)
 
+find_package(SDL2 REQUIRED)
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
@@ -24,16 +23,18 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 add_subdirectory(lexer)
 add_subdirectory(executor)
 add_subdirectory(CPU)
+add_subdirectory(sgl)
 
 add_library(grasm_static STATIC)
 target_link_libraries(grasm_static PUBLIC
     lexer_impl
     executor_impl
     cpu_impl
+    sgl_impl
 )
 
 # ----------------------------------------------------------------------------
 
 add_executable(grasm main.cpp)
 target_include_directories(grasm PUBLIC ${GRASM_ROOT} ${LLVM_INCLUDE_DIRS})
-target_link_libraries(grasm PUBLIC grasm_static LLVM)
+target_link_libraries(grasm PUBLIC grasm_static LLVM ${SDL2_LIBRARIES})

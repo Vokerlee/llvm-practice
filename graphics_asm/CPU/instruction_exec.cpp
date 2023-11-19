@@ -1,6 +1,7 @@
 #include "CPU/instruction.h"
 #include "CPU/instruction_exec.h"
 #include "CPU/CPU.h"
+#include "sgl/sgl.h"
 
 namespace grasm::exec
 {
@@ -99,14 +100,14 @@ void select(CPU *cpu, const Instruction &instr)
 
 void srand(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    sgl_srand(cpu->GetReg(attrs.rs1));
 }
 
 void rand(CPU *cpu, const Instruction &instr)
 {
-    (void) cpu;
-    (void) instr;
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, sgl_rand());
 }
 
 void cf(CPU *cpu, const Instruction &instr)

@@ -3,7 +3,7 @@
 
 #include "common/macros.h"
 #include "common/config.h"
-#include "sgl/sgl_minimal.hpp"
+#include "sgl/sgl.h"
 
 #include <cassert>
 #include <vector>
