@@ -36,6 +36,8 @@ public:
         mnemonic_(mnemonic)
     {}
 
+    ~Instruction() = default;
+
     Attrs GetAttrs() const
     {
         return attributes_;
@@ -46,7 +48,7 @@ public:
         return mnemonic_;
     }
 
-    ~Instruction() = default;
+    static void *LazyFunctionCreator(const std::string &mnemonic);
 
 private:
     InstructionId id_   {InstructionId::EXIT};

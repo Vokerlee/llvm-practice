@@ -10,7 +10,7 @@ namespace grasm::exec
 class CPU;
 
 // General operations
-void exit  (CPU *cpu, const Instruction &instr);
+void exit   (CPU *cpu, const Instruction &instr);
 
 // Register-arithmetic operations
 void addi   (CPU *cpu, const Instruction &instr);
