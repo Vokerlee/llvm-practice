@@ -1,4 +1,5 @@
 #include "executor/executor.h"
+#include "CPU/CPU.h"
 
 #include <cstdlib>
 #include <llvm/Support/raw_ostream.h>
@@ -11,7 +12,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    grasm::Executor exec;
+    grasm::CPU cpu;
+    grasm::Executor exec(&cpu);
     bool status = exec.ParseAsmFile(argv[1]);
     if (status == false)
         return EXIT_FAILURE;

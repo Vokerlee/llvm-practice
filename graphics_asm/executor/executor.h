@@ -7,6 +7,7 @@
 #include "CPU/instruction_exec.h"
 
 #include <vector>
+#include <unordered_map>
 #include <fstream>
 
 #include <llvm/Support/raw_ostream.h>
@@ -28,10 +29,17 @@ public:
     NO_COPY_SEMANTIC(Executor);
     NO_MOVE_SEMANTIC(Executor);
 
-    Executor() :
+    Executor(CPU *cpu) :
+        cpu_(cpu),
         builder_(context_)
     {
         module_ = new llvm::Module("top", context_);
+
+        llvm::FunctionType *void_type = llvm::FunctionType::get(builder_.getVoidTy(), false);
+        main_func_ = llvm::Function::Create(void_type, llvm::Function::ExternalLinkage, "main", module_);
+
+        llvm::ArrayType *reg_file_type = llvm::ArrayType::get(builder_.getInt64Ty(), CPU::REG_FILE_SIZE);
+        module_->getOrInsertGlobal("reg_file", reg_file_type);
     }
 
     ~Executor() = default;
@@ -40,11 +48,16 @@ public:
     bool Execute();
 
 private:
+    CPU *cpu_ {nullptr};
+
     std::vector<Instruction> instrs_;
+    std::unordered_map<std::string, llvm::BasicBlock *> bb_map_;
 
     llvm::LLVMContext context_;
     llvm::Module *module_ {nullptr};
     llvm::IRBuilder<> builder_;
+
+    llvm::Function *main_func_ {nullptr};
 };
 
 }; // grasm

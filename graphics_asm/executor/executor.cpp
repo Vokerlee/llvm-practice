@@ -10,17 +10,39 @@ bool Executor::ParseAsmFile(const char *filename)
     if (!lexer.IsValid())
         return false;
 
+    std::string label;
+
+    // Fulfill all labels
+    while (lexer.IsValid() == true)
+    {
+        lexer.GetNext(label);
+        if (!label.substr(label.size() - 1, label.size() - 1).compare(":"))
+        {
+            std::string label_name = label.substr(0, label.size() - 1);
+            llvm::outs() << "label " << label_name << "\n";
+            bb_map_[label_name] = llvm::BasicBlock::Create(context_, label_name, main_func_);
+        }
+    }
+
     std::string arg1;
     std::string arg2;
     std::string arg3;
     std::string arg4;
 
-    while(lexer.IsValid() == true)
+    lexer.ResetToStart();
+
+    while (lexer.IsValid() == true)
     {
         std::string mnemonic;
         lexer.GetNext(mnemonic);
-        llvm::outs() << mnemonic << "\n";
+        if (!mnemonic.compare(""))
+            break;
 
+        // That is just a label
+        if (!mnemonic.substr(mnemonic.size() - 1, mnemonic.size() - 1).compare(":"))
+            continue;
+
+        llvm::outs() << mnemonic << "\n";
         Instruction::Attrs attrs {};
 
         if (!mnemonic.compare("exit"))
@@ -158,6 +180,9 @@ bool Executor::Execute()
     }
 
     llvm::outs() << "size is " << instrs_.size() << "\n";
+
+    llvm::GlobalVariable *reg_file = module_->getNamedGlobal("reg_file");
+    (void) reg_file;
 
     return true;
 }
