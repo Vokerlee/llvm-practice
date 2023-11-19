@@ -18,17 +18,14 @@ public:
 
     struct Attrs
     {
-        Reg imm;
-        Reg rs1;
-        Reg rs2;
-        Reg rs3;
-        Reg rd;
+        Reg imm {0};
+        Reg rs1 {0};
+        Reg rs2 {0};
+        Reg rs3 {0};
+        Reg rd  {0};
     };
 
 public:
-    NO_COPY_SEMANTIC(Instruction);
-    NO_MOVE_SEMANTIC(Instruction);
-
     Instruction(InstructionId id, Attrs attributes, InstrImpl impl, std::string mnemonic = "") :
         id_(id),
         attributes_(attributes),
@@ -55,7 +52,6 @@ private:
     Attrs         attributes_;
     InstrImpl     impl_ {nullptr};
     std::string   mnemonic_;
-
 };
 
 }; // grasm

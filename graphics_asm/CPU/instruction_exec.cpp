@@ -23,6 +23,12 @@ void subi(CPU *cpu, const Instruction &instr)
     (void) instr;
 }
 
+void muli(CPU *cpu, const Instruction &instr)
+{
+    (void) cpu;
+    (void) instr;
+}
+
 void divi(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
@@ -153,25 +159,25 @@ void blue(CPU *cpu, const Instruction &instr)
     (void) instr;
 }
 
-void lw(CPU *cpu, const Instruction &instr)
+void lwi(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
     (void) instr;
 }
 
-void ld(CPU *cpu, const Instruction &instr)
+void ldi(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
     (void) instr;
 }
 
-void sw(CPU *cpu, const Instruction &instr)
+void swi(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
     (void) instr;
 }
 
-void sd(CPU *cpu, const Instruction &instr)
+void sdi(CPU *cpu, const Instruction &instr)
 {
     (void) cpu;
     (void) instr;
@@ -252,14 +258,14 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::green);
     if (mnemonic == "blue")
         return reinterpret_cast<void *>(exec::blue);
-    if (mnemonic == "lw")
-        return reinterpret_cast<void *>(exec::lw);
-    if (mnemonic == "ld")
-        return reinterpret_cast<void *>(exec::ld);
-    if (mnemonic == "sw")
-        return reinterpret_cast<void *>(exec::sw);
-    if (mnemonic == "sd")
-        return reinterpret_cast<void *>(exec::sd);
+    if (mnemonic == "lwi")
+        return reinterpret_cast<void *>(exec::lwi);
+    if (mnemonic == "ldi")
+        return reinterpret_cast<void *>(exec::ldi);
+    if (mnemonic == "swi")
+        return reinterpret_cast<void *>(exec::swi);
+    if (mnemonic == "sdi")
+        return reinterpret_cast<void *>(exec::sdi);
     if (mnemonic == "br")
         return reinterpret_cast<void *>(exec::br);
     if (mnemonic == "brif")

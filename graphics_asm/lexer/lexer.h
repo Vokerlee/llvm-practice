@@ -44,6 +44,11 @@ public:
 
     bool IsValid() const
     {
+        return !asm_file_.fail();
+    }
+
+    bool IsOpen() const
+    {
         return asm_file_.is_open();
     }
 

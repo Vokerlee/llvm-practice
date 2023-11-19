@@ -36,4 +36,4 @@ target_link_libraries(grasm_static PUBLIC
 
 add_executable(grasm main.cpp)
 target_include_directories(grasm PUBLIC ${GRASM_ROOT} ${LLVM_INCLUDE_DIRS})
-target_link_libraries(grasm PUBLIC grasm_static ${llvm_libs})
+target_link_libraries(grasm PUBLIC grasm_static LLVM)

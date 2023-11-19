@@ -15,12 +15,13 @@ enum class InstructionId
     // Register-arithmetic operations
     ADDI    = 0x1,  // addi    rd rs1 rs2
     SUBI    = 0x2,  // subi    rd rs1 rs2
-    DIVI    = 0x3,  // divi    rd rs1 rs2
-    REMI    = 0x4,  // remi    rd rs1 rs2
-    ANDI    = 0x5,  // andi    rd rs1 rs2
-    XORI    = 0x6,  // xori    rd rs1 rs2
-    MOV     = 0x7,  // mov     rd rs
-    MOVIMM  = 0x8,  // movimm  rd number
+    MULI    = 0x3,  // muli    rd rs1 rs2
+    DIVI    = 0x4,  // divi    rd rs1 rs2
+    REMI    = 0x5,  // remi    rd rs1 rs2
+    ANDI    = 0x6,  // andi    rd rs1 rs2
+    XORI    = 0x7,  // xori    rd rs1 rs2
+    MOV     = 0x8,  // mov     rd rs
+    MOVIMM  = 0x9,  // movimm  rd number
 
     // Conditional operations
     ILT     = 0x10, // ilt     rd rs1 rs2

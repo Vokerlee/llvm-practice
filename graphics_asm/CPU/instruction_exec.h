@@ -5,16 +5,20 @@
 #include "common/config.h"
 #include "CPU/instruction.h"
 
-namespace grasm::exec
+namespace grasm
 {
+
 class CPU;
 
+namespace exec
+{
 // General operations
 void exit   (CPU *cpu, const Instruction &instr);
 
 // Register-arithmetic operations
 void addi   (CPU *cpu, const Instruction &instr);
 void subi   (CPU *cpu, const Instruction &instr);
+void muli   (CPU *cpu, const Instruction &instr);
 void divi   (CPU *cpu, const Instruction &instr);
 void remi   (CPU *cpu, const Instruction &instr);
 void andi   (CPU *cpu, const Instruction &instr);
@@ -44,16 +48,17 @@ void green (CPU *cpu, const Instruction &instr);
 void blue  (CPU *cpu, const Instruction &instr);
 
 // Memory operations
-void lw    (CPU *cpu, const Instruction &instr);
-void ld    (CPU *cpu, const Instruction &instr);
-void sw    (CPU *cpu, const Instruction &instr);
-void sd    (CPU *cpu, const Instruction &instr);
+void lwi   (CPU *cpu, const Instruction &instr);
+void ldi   (CPU *cpu, const Instruction &instr);
+void swi   (CPU *cpu, const Instruction &instr);
+void sdi   (CPU *cpu, const Instruction &instr);
 
 // Branch operations
 void br    (CPU *cpu, const Instruction &instr);
 void brif  (CPU *cpu, const Instruction &instr);
 void call  (CPU *cpu, const Instruction &instr);
 
-}; // grasm::exec
+}; // exec
+}; // grasm
 
 #endif // GRASM_INSTRUCTION_EXEC_H
