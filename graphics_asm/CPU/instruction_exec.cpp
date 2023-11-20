@@ -263,6 +263,8 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::addi);
     if (mnemonic == "subi")
         return reinterpret_cast<void *>(exec::subi);
+    if (mnemonic == "muli")
+        return reinterpret_cast<void *>(exec::muli);
     if (mnemonic == "divi")
         return reinterpret_cast<void *>(exec::divi);
     if (mnemonic == "remi")

@@ -40,6 +40,8 @@ public:
         llvm::FunctionType *void_type = llvm::FunctionType::get(builder_.getVoidTy(), false);
         main_func_ = llvm::Function::Create(void_type, llvm::Function::ExternalLinkage, "main", module_);
 
+        bb_map_["__start"] = llvm::BasicBlock::Create(context_, "__start", main_func_);
+
         reg_file_type_ = llvm::ArrayType::get(builder_.getInt64Ty(), CPU::REG_FILE_SIZE);
         module_->getOrInsertGlobal("reg_file", reg_file_type_);
         reg_file_ = module_->getNamedGlobal("reg_file");
@@ -55,6 +57,7 @@ private:
 
     std::vector<Instruction> instrs_;
     std::unordered_map<std::string, llvm::BasicBlock *> bb_map_;
+    std::unordered_map<std::string, llvm::Function *> func_map_;
 
     llvm::LLVMContext context_;
     llvm::Module *module_ {nullptr};

@@ -9,7 +9,10 @@ namespace grasm
 
 enum class InstructionId
 {
+    // Pseudo instructions (helpers)
     LABEL     = 0xff,
+    FUNC      = 0xfe,
+    FUNC_END  = 0xfd,
 
     // General operations
     EXIT      = 0x0,  // exit
@@ -23,7 +26,7 @@ enum class InstructionId
     ANDI      = 0x6,  // andi    rd rs1 rs2
     XORI      = 0x7,  // xori    rd rs1 rs2
     MOV       = 0x8,  // mov     rd rs
-    MOV_IMM   = 0x9,  // movimm  rd imm
+    MOV_IMM   = 0x9,  // mov_imm rd imm
 
     // Conditional operations
     ILT       = 0x10, // ilt     rd rs1 rs2

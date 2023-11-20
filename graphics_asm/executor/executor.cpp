@@ -2,6 +2,8 @@
 #include "lexer/lexer.h"
 #include "sgl/sgl.h"
 
+#include <stack>
+
 namespace grasm
 {
 
@@ -16,6 +18,9 @@ bool Executor::ParseAsmFile(const char *filename)
     std::string arg3;
     std::string arg4;
 
+    std::stack<std::string> last_func_names;
+    last_func_names.push("main");
+
     while (lexer.IsValid() == true)
     {
         Instruction::Attrs attrs {};
@@ -25,17 +30,46 @@ bool Executor::ParseAsmFile(const char *filename)
         if (!mnemonic.compare(""))
             break;
 
-        // That is just a label
-        if (!mnemonic.substr(mnemonic.size() - 1, mnemonic.size() - 1).compare(":"))
+        // That is just a label or func
+        if (!mnemonic.substr(mnemonic.size() - 1, 1).compare(":"))
         {
+            if (!mnemonic.substr(mnemonic.size() - 2, 1).compare(":"))
+            {
+                std::string func_name = mnemonic.substr(0, mnemonic.size() - 2);
+                llvm::outs() << "func " << func_name << "\n";
+
+                llvm::FunctionType *void_type = llvm::FunctionType::get(builder_.getVoidTy(), false);
+                func_map_[func_name] =
+                    llvm::Function::Create(void_type, llvm::Function::ExternalLinkage, func_name, module_);
+
+                bb_map_["__" + func_name] = llvm::BasicBlock::Create(context_, "__" + func_name, func_map_[func_name]);
+
+                attrs.label = func_name;
+                instrs_.push_back(Instruction(InstructionId::FUNC, attrs, nullptr, func_name));
+                last_func_names.push(func_name);
+
+                continue;
+            }
+
             std::string label_name = mnemonic.substr(0, mnemonic.size() - 1);
-            llvm::outs() << "label " << label_name << "\n";
+            std::string last_func = last_func_names.top();
+            llvm::outs() << "label " << last_func + "_" + label_name << "\n";
 
-            bb_map_[label_name] = llvm::BasicBlock::Create(context_, label_name, main_func_);
+            bb_map_[last_func + "_" + label_name] = llvm::BasicBlock::Create(context_, last_func + "_" + label_name, func_map_[last_func]);
 
-            attrs.label = label_name;
-            instrs_.push_back(Instruction(InstructionId::LABEL, attrs, nullptr, label_name));
+            attrs.label = last_func + "_" + label_name;
+            instrs_.push_back(Instruction(InstructionId::LABEL, attrs, nullptr, last_func + "_" + label_name));
 
+            continue;
+        }
+        else if (!mnemonic.substr(0, 2).compare("::"))
+        {
+            std::string func_name = mnemonic.substr(2, mnemonic.size() - 2);
+            llvm::outs() << "func_end " << func_name << "\n";
+
+            attrs.label = func_name;
+            instrs_.push_back(Instruction(InstructionId::FUNC_END, attrs, nullptr, func_name));
+            last_func_names.pop();
             continue;
         }
 
@@ -100,10 +134,11 @@ bool Executor::ParseAsmFile(const char *filename)
         }
         else if (!mnemonic.compare("brif"))
         {
+            std::string last_func = last_func_names.top();
             lexer.GetNext(arg1).GetNext(arg2).GetNext(arg3);
             attrs.rs1 = stoi(arg1.substr(1));
-            attrs.label     = arg2;
-            attrs.label_alt = arg3;
+            attrs.label     = last_func + "_" + arg2;
+            attrs.label_alt = last_func + "_" + arg3;
 
             if (!mnemonic.compare("brif"))
                 instrs_.push_back(Instruction(InstructionId::BRIF, attrs, exec::brif, "brif"));
@@ -173,12 +208,19 @@ bool Executor::ParseAsmFile(const char *filename)
         else if (!mnemonic.compare("br") || !mnemonic.compare("call"))
         {
             lexer.GetNext(arg1);
-            attrs.label = arg1;
 
             if (!mnemonic.compare("br"))
-                instrs_.push_back(Instruction(InstructionId::BR, attrs, exec::br, "br"));
+            {
+                std::string last_func = last_func_names.top();
+                attrs.label = last_func + "_" + arg1;
+                instrs_.push_back(Instruction(InstructionId::BR,   attrs, exec::br,   "br"));
+
+            }
             else if (!mnemonic.compare("call"))
+            {
+                attrs.label = arg1;
                 instrs_.push_back(Instruction(InstructionId::CALL, attrs, exec::call, "call"));
+            }
         }
         else if (!mnemonic.compare("cf") || !mnemonic.compare("rand"))
         {
@@ -210,16 +252,51 @@ bool Executor::Execute()
     if (instrs_[0].GetId() == InstructionId::LABEL)
         builder_.SetInsertPoint(bb_map_[instrs_[0].GetAttrs().label]);
     else
-    {
-        bb_map_["__start"] = llvm::BasicBlock::Create(context_, "__start", main_func_);
         builder_.SetInsertPoint(bb_map_["__start"]);
-    }
+
+    std::stack<llvm::BasicBlock *> func_bb_stack;
+    std::stack<std::string> func_names_stack;
+    llvm::BasicBlock *bb_cur = builder_.GetInsertBlock();
 
     for (auto &instr : instrs_)
     {
+        module_->print(llvm::outs(), nullptr);
+        llvm::outs() << "================================================\n";
+
         if (instr.GetId() == InstructionId::LABEL)
         {
-            builder_.SetInsertPoint(bb_map_[instr.GetAttrs().label]);
+            llvm::BasicBlock *bb = bb_map_[instr.GetAttrs().label];
+            bb_cur = bb;
+            builder_.SetInsertPoint(bb);
+            continue;
+        }
+        else if (instr.GetId() == InstructionId::FUNC)
+        {
+            func_bb_stack.push(bb_cur);
+
+            llvm::BasicBlock *bb = bb_map_["__" + instr.GetAttrs().label];
+            bb_cur = bb;
+            builder_.SetInsertPoint(bb);
+
+            continue;
+        }
+        else if (instr.GetId() == InstructionId::FUNC_END)
+        {
+            bb_cur = func_bb_stack.top();
+            func_bb_stack.pop();
+            builder_.SetInsertPoint(bb_cur);
+            continue;
+        }
+        else if (instr.GetId() == InstructionId::CALL)
+        {
+            llvm::Function *func = func_map_[instr.GetAttrs().label];
+            builder_.CreateCall(func);
+
+            continue;
+        }
+        else if (instr.GetId() == InstructionId::RET)
+        {
+            builder_.CreateRetVoid();
             continue;
         }
         else if (instr.GetId() == InstructionId::EXIT)
