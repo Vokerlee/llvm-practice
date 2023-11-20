@@ -48,6 +48,19 @@ public:
         regs_[reg_idx] = reg;
     }
 
+    void PushReg(Reg reg)
+    {
+        stack_.push(reg);
+    }
+
+    Reg PopReg()
+    {
+        Reg value = stack_.top();
+        stack_.pop();
+
+        return value;
+    }
+
     Reg GetPC() const
     {
         return pc_;
@@ -94,7 +107,7 @@ protected:
 
     bool is_idle {true};
 
-    std::stack<Reg> call_stack_;
+    std::stack<Reg> stack_;
     std::vector<FrameBuffer *> frames_;
 };
 

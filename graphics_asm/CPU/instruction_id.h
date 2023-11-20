@@ -66,6 +66,10 @@ enum class InstructionId
 
     CALL      = 0x42, // call    label
     RET       = 0x43, // ret
+
+    // Stack operations
+    PUSH      = 0x44, // push    rs
+    POP       = 0x45, // pop     rd
 };
 
 }; // grasm

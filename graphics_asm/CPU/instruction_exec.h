@@ -65,6 +65,10 @@ void brif      (CPU *cpu, const Instruction &instr);
 void call      (CPU *cpu, const Instruction &instr);
 void ret       (CPU *cpu, const Instruction &instr);
 
+// Stack operations
+void push      (CPU *cpu, const Instruction &instr);
+void pop       (CPU *cpu, const Instruction &instr);
+
 }; // exec
 
 }; // grasm

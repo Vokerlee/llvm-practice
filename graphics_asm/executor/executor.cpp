@@ -195,7 +195,7 @@ bool Executor::ParseAsmFile(const char *filename)
             if (!mnemonic.compare("rgb_imm"))
                 instrs_.push_back(Instruction(InstructionId::RGB_IMM, attrs, exec::rgb_imm, "rgb_imm"));
         }
-        else if (!mnemonic.compare("srand") || !mnemonic.compare("flush"))
+        else if (!mnemonic.compare("srand") || !mnemonic.compare("flush") || !mnemonic.compare("push"))
         {
             lexer.GetNext(arg1);
             attrs.rs1 = stoi(arg1.substr(1));
@@ -204,6 +204,8 @@ bool Executor::ParseAsmFile(const char *filename)
                 instrs_.push_back(Instruction(InstructionId::SRAND, attrs, exec::srand, "srand"));
             else if (!mnemonic.compare("flush"))
                 instrs_.push_back(Instruction(InstructionId::FLUSH, attrs, exec::flush, "flush"));
+            else if (!mnemonic.compare("push"))
+                instrs_.push_back(Instruction(InstructionId::PUSH,  attrs, exec::push,  "push"));
         }
         else if (!mnemonic.compare("br") || !mnemonic.compare("call"))
         {
@@ -222,7 +224,7 @@ bool Executor::ParseAsmFile(const char *filename)
                 instrs_.push_back(Instruction(InstructionId::CALL, attrs, exec::call, "call"));
             }
         }
-        else if (!mnemonic.compare("cf") || !mnemonic.compare("rand"))
+        else if (!mnemonic.compare("cf") || !mnemonic.compare("rand") || !mnemonic.compare("pop"))
         {
             lexer.GetNext(arg1);
             attrs.rd = stoi(arg1.substr(1));
@@ -231,6 +233,8 @@ bool Executor::ParseAsmFile(const char *filename)
                 instrs_.push_back(Instruction(InstructionId::CF,   attrs, exec::cf,   "cf"));
             else if (!mnemonic.compare("rand"))
                 instrs_.push_back(Instruction(InstructionId::RAND, attrs, exec::rand, "rand"));
+            else if (!mnemonic.compare("pop"))
+                instrs_.push_back(Instruction(InstructionId::POP,  attrs, exec::pop,  "pop"));
         }
     }
 

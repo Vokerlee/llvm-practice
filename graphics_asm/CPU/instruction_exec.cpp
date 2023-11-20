@@ -250,6 +250,18 @@ void ret(CPU *cpu, const Instruction &instr)
     llvm::errs() << "Error: instruction \"ret\" is not available yet\n";
 }
 
+void push(CPU *cpu, const Instruction &instr)
+{
+    auto attrs = instr.GetAttrs();
+    cpu->PushReg(cpu->GetReg(attrs.rs1));
+}
+
+void pop(CPU *cpu, const Instruction &instr)
+{
+    auto attrs = instr.GetAttrs();
+    cpu->SetReg(attrs.rd, cpu->PopReg());
+}
+
 } // grasm::exec
 
 namespace grasm
@@ -333,6 +345,10 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::call);
     if (mnemonic == "ret")
         return reinterpret_cast<void *>(exec::ret);
+    if (mnemonic == "push")
+        return reinterpret_cast<void *>(exec::push);
+    if (mnemonic == "pop")
+        return reinterpret_cast<void *>(exec::pop);
 
     return nullptr;
 }
