@@ -209,7 +209,7 @@ void ldi(CPU *cpu, const Instruction &instr)
 void swi(CPU *cpu, const Instruction &instr)
 {
     auto attrs = instr.GetAttrs();
-    *((int *) cpu->GetReg(attrs.rd)) = cpu->GetReg(attrs.rs1);
+    *((int *) cpu->GetReg(attrs.rd)) = (int) cpu->GetReg(attrs.rs1);
 }
 
 void sdi(CPU *cpu, const Instruction &instr)

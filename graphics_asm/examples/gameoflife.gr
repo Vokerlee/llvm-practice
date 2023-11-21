@@ -1,0 +1,180 @@
+    br start
+
+start:
+    call intro
+
+    mov x27 x30
+    call init_frame
+    flush x27
+
+    mov_imm x26 1000
+    br loop
+
+loop:
+    eq x1 x25 x19
+    select x27 x31 x30 x1
+    select x28 x30 x31 x1
+
+    call draw_frame
+    flush x28
+
+    addi x25 x25 x19
+    remi x25 x25 x20
+
+    neq x1 x26 x19
+    subi x26 x26 x19
+    brif x1 loop loop_exit
+
+loop_exit:
+
+    exit
+
+intro::
+    cf x30
+    cf x31
+
+    mov_imm x19 1
+    mov_imm x20 2
+    mov_imm x21 1080
+    mov_imm x22 720
+    mov_imm x23 255
+
+    mov_imm x25 0
+
+    ret
+::intro
+
+init_frame::
+    mov_imm x1 0
+    br for_i
+
+for_i:
+
+    mov_imm x2 0
+    br for_j
+
+for_j:
+    rand x4
+    remi x4 x4 x20
+    muli x4 x4 x23
+
+    xori x5 x5 x5
+    green x5 x4
+
+    gp x6 x27 x1 x2
+    swi x6 x5
+
+    addi x2 x2 x19
+    neq x3 x2 x21
+    brif x3 for_j for_j_exit
+
+for_j_exit:
+    addi x1 x1 x19
+    neq x3 x1 x22
+    brif x3 for_i for_i_exit
+
+for_i_exit:
+
+    ret
+::init_frame
+
+draw_frame::
+    mov_imm x1 0
+    br for_i
+
+for_i:
+
+    mov_imm x2 0
+    br for_j
+
+for_j:
+    xori x4 x4 x4
+
+    mov_imm x5 -1
+    br for_y
+
+for_y:
+    mov_imm x6 -1
+    br for_x
+
+for_x:
+    addi x7 x1 x5
+    addi x7 x7 x22
+    remi x7 x7 x22
+    addi x8 x2 x6
+    addi x8 x8 x21
+    remi x8 x8 x21
+
+    gp x9 x27 x7 x8
+    lwi x10 x9
+
+    brif x10 inc_neighbour inc_neighbour_exit
+
+inc_neighbour:
+    addi x4 x4 x19
+    br inc_neighbour_exit
+
+inc_neighbour_exit:
+
+    addi x6 x6 x19
+    ilt x3 x6 x20
+    brif x3 for_x for_x_exit
+
+for_x_exit:
+
+    addi x5 x5 x19
+    neq x3 x5 x20
+    brif x3 for_y for_y_exit
+
+for_y_exit:
+
+    gp x9 x27 x1 x2
+    mov_imm x8 0
+
+    lwi x10 x9
+    neq x10 x10 x8
+    eq x11 x10 x8
+
+    mov_imm x8 3
+    eq x16 x8 x4
+    neq x17 x8 x4
+
+    xori x12 x12 x12
+
+    addi x15 x17 x10
+    eq x15 x15 x20
+
+    addi x14 x16 x11
+    eq x14 x14 x20
+    br create_cell
+
+create_cell:
+    brif x14 create_cell_cont kill_cell
+create_cell_cont:
+    green x12 x23
+    br cell_exit
+
+kill_cell:
+    brif x15 cell_exit cell_no_change
+
+cell_no_change:
+    mov x12 x10
+    br cell_exit
+
+cell_exit:
+    gp x9 x28 x1 x2
+    swi x9 x12
+
+    addi x2 x2 x19
+    neq x3 x2 x21
+    brif x3 for_j for_j_exit
+
+for_j_exit:
+    addi x1 x1 x19
+    neq x3 x1 x22
+    brif x3 for_i for_i_exit
+
+for_i_exit:
+
+    ret
+::draw_frame
