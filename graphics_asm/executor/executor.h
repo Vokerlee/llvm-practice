@@ -39,6 +39,7 @@ public:
 
         llvm::FunctionType *void_type = llvm::FunctionType::get(builder_.getVoidTy(), false);
         main_func_ = llvm::Function::Create(void_type, llvm::Function::ExternalLinkage, "main", module_);
+        func_map_["main"] = main_func_;
 
         bb_map_["__start"] = llvm::BasicBlock::Create(context_, "__start", main_func_);
 

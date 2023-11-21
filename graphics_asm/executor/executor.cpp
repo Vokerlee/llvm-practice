@@ -354,9 +354,13 @@ bool Executor::Execute()
     ee->addGlobalMapping(reg_file_, (void *) cpu_->regs_);
     ee->finalizeObject();
 
+    sgl_initialize();
+
     llvm::outs() << "\n#[Running code]\n";
     llvm::ArrayRef<llvm::GenericValue> noargs;
     ee->runFunction(main_func_, noargs);
+
+    sgl_close();
 
     cpu_->DumpRegs();
 
