@@ -105,8 +105,18 @@ for_x:
     addi x8 x8 x21
     remi x8 x8 x21
 
+    eq x13 x7 x1
+    eq x14 x8 x2
+    addi x13 x13 x14
+    eq x13 x13 x20
+    brif x13 inc_neighbour_exit not_myself
+
+not_myself:
+
     gp x9 x27 x7 x8
     lwi x10 x9
+
+    red x13 x13
 
     brif x10 inc_neighbour inc_neighbour_exit
 
@@ -123,7 +133,7 @@ inc_neighbour_exit:
 for_x_exit:
 
     addi x5 x5 x19
-    neq x3 x5 x20
+    ilt x3 x5 x20
     brif x3 for_y for_y_exit
 
 for_y_exit:
@@ -138,19 +148,19 @@ for_y_exit:
     mov_imm x8 3
     eq x16 x8 x4
     neq x17 x8 x4
+    neq x18 x20 x4
 
     xori x12 x12 x12
 
-    addi x15 x17 x10
-    eq x15 x15 x20
+    addi x15 x17 x18
+    addi x15 x15 x10
+    eq x15 x15 x8
 
     addi x14 x16 x11
     eq x14 x14 x20
-    br create_cell
+    brif x14 create_cell kill_cell
 
 create_cell:
-    brif x14 create_cell_cont kill_cell
-create_cell_cont:
     green x12 x23
     br cell_exit
 
