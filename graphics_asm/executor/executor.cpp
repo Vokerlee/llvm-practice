@@ -267,70 +267,74 @@ bool Executor::Execute()
         module_->print(llvm::outs(), nullptr);
         llvm::outs() << "================================================\n";
 
-        if (instr.GetId() == InstructionId::LABEL)
-        {
-            llvm::BasicBlock *bb = bb_map_[instr.GetAttrs().label];
-            bb_cur = bb;
-            builder_.SetInsertPoint(bb);
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::FUNC)
-        {
-            func_bb_stack.push(bb_cur);
+        InstructionId instr_id = instr.GetId();
 
-            llvm::BasicBlock *bb = bb_map_["__" + instr.GetAttrs().label];
-            bb_cur = bb;
-            builder_.SetInsertPoint(bb);
-
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::FUNC_END)
+        switch (instr_id)
         {
-            bb_cur = func_bb_stack.top();
-            func_bb_stack.pop();
-            builder_.SetInsertPoint(bb_cur);
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::CALL)
-        {
-            llvm::Function *func = func_map_[instr.GetAttrs().label];
-            builder_.CreateCall(func);
-
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::RET)
-        {
-            builder_.CreateRetVoid();
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::EXIT)
-        {
-            builder_.CreateRetVoid();
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::BR)
-        {
-            builder_.CreateBr(bb_map_[instr.GetAttrs().label]);
-            continue;
-        }
-        else if (instr.GetId() == InstructionId::BRIF)
-        {
-            llvm::Value *val_ptr =
+            case InstructionId::LABEL:
+            {
+                llvm::BasicBlock *bb = bb_map_[instr.GetAttrs().label];
+                bb_cur = bb;
+                builder_.SetInsertPoint(bb);
+                break;
+            }
+            case InstructionId::FUNC:
+            {
+                func_bb_stack.push(bb_cur);
+                llvm::BasicBlock *bb = bb_map_["__" + instr.GetAttrs().label];
+                bb_cur = bb;
+                builder_.SetInsertPoint(bb);
+                break;
+            }
+            case InstructionId::FUNC_END:
+            {
+                bb_cur = func_bb_stack.top();
+                func_bb_stack.pop();
+                builder_.SetInsertPoint(bb_cur);
+                break;
+            }
+            case InstructionId::CALL:
+            {
+                llvm::Function *func = func_map_[instr.GetAttrs().label];
+                builder_.CreateCall(func);
+                break;
+            }
+            case InstructionId::RET:
+            {
+                builder_.CreateRetVoid();
+                break;
+            }
+            case InstructionId::EXIT:
+            {
+                builder_.CreateRetVoid();
+                break;
+            }
+            case InstructionId::BR:
+            {
+                builder_.CreateBr(bb_map_[instr.GetAttrs().label]);
+                break;
+            }
+            case InstructionId::BRIF:
+            {
+                llvm::Value *val_ptr =
                 builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs1);
 
-            llvm::Value *cond = builder_.CreateICmpEQ(
-                builder_.CreateLoad(builder_.getInt64Ty(), val_ptr),
-                llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), 0, true));
+                llvm::Value *cond = builder_.CreateICmpEQ(
+                    builder_.CreateLoad(builder_.getInt64Ty(), val_ptr),
+                    llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), 0, true));
 
-            builder_.CreateCondBr(cond, bb_map_[instr.GetAttrs().label_alt],
-                                        bb_map_[instr.GetAttrs().label]);
+                builder_.CreateCondBr(cond, bb_map_[instr.GetAttrs().label_alt],
+                                            bb_map_[instr.GetAttrs().label]);
 
-            continue;
+                break;
+            }
+            default:
+            {
+                llvm::Value *instr_ptr = builder_.getInt64((uint64_t) &instr);
+                builder_.CreateCall(module_->getOrInsertFunction(instr.GetMnemonic(), instr_call_type),
+                    llvm::ArrayRef<llvm::Value *>({cpu_ptr, instr_ptr}));
+            }
         }
-
-        llvm::Value *instr_ptr = builder_.getInt64((uint64_t) &instr);
-        builder_.CreateCall(module_->getOrInsertFunction(instr.GetMnemonic(), instr_call_type),
-            llvm::ArrayRef<llvm::Value *>({cpu_ptr, instr_ptr}));
     }
 
     llvm::outs() << "\n#[LLVM IR]:\n";
