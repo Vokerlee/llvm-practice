@@ -277,12 +277,6 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::rand);
     if (mnemonic == "cf")
         return reinterpret_cast<void *>(exec::cf);
-    if (mnemonic == "gr")
-        return reinterpret_cast<void *>(exec::gr);
-    if (mnemonic == "gpr")
-        return reinterpret_cast<void *>(exec::gpr);
-    if (mnemonic == "gp")
-        return reinterpret_cast<void *>(exec::gp);
     if (mnemonic == "flush")
         return reinterpret_cast<void *>(exec::flush);
     if (mnemonic == "rgb")
@@ -349,6 +343,12 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::eq);
     if (mnemonic == "neq")
         return reinterpret_cast<void *>(exec::neq);
+    if (mnemonic == "gr")
+        return reinterpret_cast<void *>(exec::gr);
+    if (mnemonic == "gpr")
+        return reinterpret_cast<void *>(exec::gpr);
+    if (mnemonic == "gp")
+        return reinterpret_cast<void *>(exec::gp);
 
     return nullptr;
 }

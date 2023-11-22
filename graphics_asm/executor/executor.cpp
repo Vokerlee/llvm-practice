@@ -268,6 +268,8 @@ bool Executor::Execute()
             builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs1);
         llvm::Value *rs2_ptr =
             builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs2);
+        llvm::Value *rs3_ptr =
+            builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs3);
         llvm::Value *rd_ptr =
             builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rd);
 
@@ -448,6 +450,45 @@ bool Executor::Execute()
                     builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
 
                 builder_.CreateStore(builder_.CreateZExt(cmp_res, builder_.getInt64Ty()), rd_ptr);
+                break;
+            }
+            case InstructionId::GR:
+            {
+                llvm::Value *val1 = builder_.CreateMul(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr),
+                    llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), sizeof(int), true));
+                llvm::Value *val2 = builder_.CreateAdd(
+                    val1, builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr));
+
+                builder_.CreateStore(val2, rd_ptr);
+                break;
+            }
+            case InstructionId::GPR:
+            {
+                llvm::Value *val1 = builder_.CreateMul(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr),
+                    llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), SGL_WIDTH_DEFAULT, true));
+                llvm::Value *val2 = builder_.CreateMul(
+                    val1, llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), sizeof(int), true));
+                llvm::Value *val3 = builder_.CreateAdd(
+                    val2, builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr));
+
+                builder_.CreateStore(val3, rd_ptr);
+                break;
+            }
+            case InstructionId::GP:
+            {
+                llvm::Value *val1 = builder_.CreateMul(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr),
+                    llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), SGL_WIDTH_DEFAULT, true));
+                llvm::Value *val2 = builder_.CreateAdd(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs3_ptr), val1);
+                llvm::Value *val3 = builder_.CreateMul(
+                    val2, llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), sizeof(int), true));
+                llvm::Value *val4 = builder_.CreateAdd(
+                    val3, builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr));
+
+                builder_.CreateStore(val4, rd_ptr);
                 break;
             }
             default:
