@@ -269,34 +269,6 @@ namespace grasm
 
 void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
 {
-    if (mnemonic == "exit")
-        return reinterpret_cast<void *>(exec::exit);
-    if (mnemonic == "addi")
-        return reinterpret_cast<void *>(exec::addi);
-    if (mnemonic == "subi")
-        return reinterpret_cast<void *>(exec::subi);
-    if (mnemonic == "muli")
-        return reinterpret_cast<void *>(exec::muli);
-    if (mnemonic == "divi")
-        return reinterpret_cast<void *>(exec::divi);
-    if (mnemonic == "remi")
-        return reinterpret_cast<void *>(exec::remi);
-    if (mnemonic == "andi")
-        return reinterpret_cast<void *>(exec::andi);
-    if (mnemonic == "xori")
-        return reinterpret_cast<void *>(exec::xori);
-    if (mnemonic == "mov")
-        return reinterpret_cast<void *>(exec::mov);
-    if (mnemonic == "mov_imm")
-        return reinterpret_cast<void *>(exec::mov_imm);
-    if (mnemonic == "ilt")
-        return reinterpret_cast<void *>(exec::ilt);
-    if (mnemonic == "imet")
-        return reinterpret_cast<void *>(exec::imet);
-    if (mnemonic == "eq")
-        return reinterpret_cast<void *>(exec::eq);
-    if (mnemonic == "neq")
-        return reinterpret_cast<void *>(exec::neq);
     if (mnemonic == "select")
         return reinterpret_cast<void *>(exec::select);
     if (mnemonic == "srand")
@@ -349,6 +321,34 @@ void *Instruction::LazyFunctionCreator(const std::string &mnemonic)
         return reinterpret_cast<void *>(exec::push);
     if (mnemonic == "pop")
         return reinterpret_cast<void *>(exec::pop);
+    if (mnemonic == "exit")
+        return reinterpret_cast<void *>(exec::exit);
+    if (mnemonic == "addi")
+        return reinterpret_cast<void *>(exec::addi);
+    if (mnemonic == "subi")
+        return reinterpret_cast<void *>(exec::subi);
+    if (mnemonic == "muli")
+        return reinterpret_cast<void *>(exec::muli);
+    if (mnemonic == "divi")
+        return reinterpret_cast<void *>(exec::divi);
+    if (mnemonic == "remi")
+        return reinterpret_cast<void *>(exec::remi);
+    if (mnemonic == "andi")
+        return reinterpret_cast<void *>(exec::andi);
+    if (mnemonic == "xori")
+        return reinterpret_cast<void *>(exec::xori);
+    if (mnemonic == "mov")
+        return reinterpret_cast<void *>(exec::mov);
+    if (mnemonic == "mov_imm")
+        return reinterpret_cast<void *>(exec::mov_imm);
+    if (mnemonic == "ilt")
+        return reinterpret_cast<void *>(exec::ilt);
+    if (mnemonic == "imet")
+        return reinterpret_cast<void *>(exec::imet);
+    if (mnemonic == "eq")
+        return reinterpret_cast<void *>(exec::eq);
+    if (mnemonic == "neq")
+        return reinterpret_cast<void *>(exec::neq);
 
     return nullptr;
 }

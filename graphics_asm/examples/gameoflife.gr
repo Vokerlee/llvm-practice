@@ -116,8 +116,6 @@ not_myself:
     gp x9 x27 x7 x8
     lwi x10 x9
 
-    red x13 x13
-
     brif x10 inc_neighbour inc_neighbour_exit
 
 inc_neighbour:

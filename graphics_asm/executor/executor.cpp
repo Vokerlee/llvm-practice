@@ -264,8 +264,12 @@ bool Executor::Execute()
 
     for (auto &instr : instrs_)
     {
-        module_->print(llvm::outs(), nullptr);
-        llvm::outs() << "================================================\n";
+        llvm::Value *rs1_ptr =
+            builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs1);
+        llvm::Value *rs2_ptr =
+            builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs2);
+        llvm::Value *rd_ptr =
+            builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rd);
 
         InstructionId instr_id = instr.GetId();
 
@@ -317,7 +321,7 @@ bool Executor::Execute()
             case InstructionId::BRIF:
             {
                 llvm::Value *val_ptr =
-                builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs1);
+                    builder_.CreateConstGEP2_64(reg_file_type_, reg_file_, 0, instr.GetAttrs().rs1);
 
                 llvm::Value *cond = builder_.CreateICmpEQ(
                     builder_.CreateLoad(builder_.getInt64Ty(), val_ptr),
@@ -326,6 +330,124 @@ bool Executor::Execute()
                 builder_.CreateCondBr(cond, bb_map_[instr.GetAttrs().label_alt],
                                             bb_map_[instr.GetAttrs().label]);
 
+                break;
+            }
+            case InstructionId::ADDI:
+            {
+                llvm::Value *op_res = builder_.CreateAdd(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::SUBI:
+            {
+                llvm::Value *op_res = builder_.CreateSub(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::MULI:
+            {
+                llvm::Value *op_res = builder_.CreateMul(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::DIVI:
+            {
+                llvm::Value *op_res = builder_.CreateSDiv(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::REMI:
+            {
+                llvm::Value *op_res = builder_.CreateSRem(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::ANDI:
+            {
+                llvm::Value *op_res = builder_.CreateAnd(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::XORI:
+            {
+                llvm::Value *op_res = builder_.CreateXor(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(op_res, rd_ptr);
+
+                break;
+            }
+            case InstructionId::MOV:
+            {
+                builder_.CreateStore(builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr), rd_ptr);
+                break;
+            }
+            case InstructionId::MOV_IMM:
+            {
+                builder_.CreateStore(
+                        llvm::ConstantInt::get(llvm::Type::getInt64Ty(context_), instr.GetAttrs().imm, true),
+                        rd_ptr);
+                break;
+            }
+            case InstructionId::ILT:
+            {
+                llvm::Value *cmp_res = builder_.CreateICmpSLT(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(builder_.CreateZExt(cmp_res, builder_.getInt64Ty()), rd_ptr);
+                break;
+            }
+            case InstructionId::IMET:
+            {
+                llvm::Value *cmp_res = builder_.CreateICmpSGE(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(builder_.CreateZExt(cmp_res, builder_.getInt64Ty()), rd_ptr);
+                break;
+            }
+            case InstructionId::EQ:
+            {
+                llvm::Value *cmp_res = builder_.CreateICmpEQ(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(builder_.CreateZExt(cmp_res, builder_.getInt64Ty()), rd_ptr);
+                break;
+            }
+            case InstructionId::NEQ:
+            {
+                llvm::Value *cmp_res = builder_.CreateICmpNE(
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs1_ptr),
+                    builder_.CreateLoad(builder_.getInt64Ty(), rs2_ptr));
+
+                builder_.CreateStore(builder_.CreateZExt(cmp_res, builder_.getInt64Ty()), rd_ptr);
                 break;
             }
             default:
