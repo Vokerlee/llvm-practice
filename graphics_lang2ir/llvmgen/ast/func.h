@@ -2,6 +2,7 @@
 #define GRLANG_LLVMGEN_AST_FUNC_H
 
 #include "llvmgen/ast/base.h"
+#include "llvmgen/ast/vars.h"
 
 namespace grlang
 {
@@ -11,7 +12,7 @@ namespace llvmgen
 
 using FuncParamPtr = std::shared_ptr<FuncParamNode>;
 using FuncScopePtr = std::shared_ptr<FuncScopeNode>;
-using FuncDeclPtr  = std::shared_ptr<FuncDeclNode>;
+using FuncProtPtr  = std::shared_ptr<FuncProtNode>;
 
 class FuncParamNode : public VarNode
 {
@@ -33,18 +34,17 @@ private:
     llvm::Argument *arg_ = nullptr;
 };
 
-
 class FuncScopeNode : public Node
 {
 public:
     FuncScopeNode() = default;
 
-    void SetFunc(FuncDeclPtr func)
+    void SetParentFuncDecl(FuncProtPtr func)
     {
         parent_func_ = func;
     }
 
-    auto GetFunc() const
+    auto GetParentFuncDecl() const
     {
         return parent_func_.lock();
     }
@@ -92,13 +92,13 @@ private:
     std::vector<FuncScopePtr> children_scopes_ {};
 
     std::weak_ptr<FuncScopeNode> parent_      {};
-    std::weak_ptr<FuncDeclNode>  parent_func_ {};
+    std::weak_ptr<FuncProtNode>  parent_func_ {};
 };
 
-class FuncDeclNode : public DeclNode
+class FuncProtNode : public DeclNode
 {
 public:
-    FuncDeclNode(const std::string &name, const std::vector<FuncParamPtr> &params,
+    FuncProtNode(const std::string &name, const std::vector<FuncParamPtr> &params,
                 FuncScopePtr body, llvm::Type *ret = nullptr) :
         DeclNode(name), ret_type_(ret), params_(params), body_(body)
     {
@@ -106,7 +106,7 @@ public:
             body_->AddDecl(param);
     }
 
-    DEFAULT_COPY_SEMANTIC(FuncDeclNode);
+    DEFAULT_COPY_SEMANTIC(FuncProtNode);
 
     llvm::Value *CodeGen(Context &ctx) override;
 

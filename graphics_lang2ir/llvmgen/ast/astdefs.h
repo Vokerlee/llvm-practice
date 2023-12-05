@@ -15,10 +15,12 @@ class IntNode;
 class BinOpNode;
 class VarNode;
 class ArrayAccessNode;
-class GlobVarNode;
+class FuncProtNode;
 class FuncParamNode;
 class FuncDeclNode;
 class FuncScopeNode;
+class IfNode;
+class WhileNode;
 
 } // namespace llvmgen
 } // namespace grlang

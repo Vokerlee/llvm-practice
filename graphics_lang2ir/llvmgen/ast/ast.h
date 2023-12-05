@@ -5,5 +5,6 @@
 #include "llvmgen/ast/base.h"
 #include "llvmgen/ast/vars.h"
 #include "llvmgen/ast/func.h"
+#include "llvmgen/ast/control_flow.h"
 
 #endif // GRLANG_LLVMGEN_AST_AST_H

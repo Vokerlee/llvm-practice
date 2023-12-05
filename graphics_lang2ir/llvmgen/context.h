@@ -59,6 +59,11 @@ public:
         return &module_;
     }
 
+    auto GetLLVMContext()
+    {
+        return &context_;
+    }
+
 private:
     llvm::LLVMContext context_;
     llvm::Module module_;

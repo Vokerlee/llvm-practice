@@ -4,6 +4,7 @@
 #include "common/config.h"
 #include "common/macros.h"
 #include "llvmgen/context.h"
+#include "llvmgen/ast/astdefs.h"
 
 #include <algorithm>
 #include <cassert>
