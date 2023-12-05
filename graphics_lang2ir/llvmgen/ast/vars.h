@@ -24,10 +24,10 @@ public:
     void Store(Context &ctx, llvm::Value *value) override
     {
         if (alloca_ == nullptr)
-            throw std::runtime_error{"Trying to assign value to undeclared variable"};
+            throw std::runtime_error("Trying to assign value to undeclared variable");
 
         if (!type_->isIntegerTy())
-            throw std::runtime_error{"Trying to assign value to non-scalar variable"};
+            throw std::runtime_error("Trying to assign value to non-scalar variable");
 
         ctx.GetBuilder()->CreateStore(value, alloca_);
     }

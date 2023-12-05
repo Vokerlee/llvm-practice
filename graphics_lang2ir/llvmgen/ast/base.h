@@ -50,6 +50,7 @@ private:
 
 class StoreableNode : public DeclNode
 {
+public:
     StoreableNode(const std::string &name) : DeclNode(name)
     {}
     virtual void Store(Context &ctx, llvm::Value *value) = 0;
@@ -58,7 +59,7 @@ class StoreableNode : public DeclNode
 class AssignNode : public Node
 {
 public:
-    AsNode(StoreablePtr lhs, NodePtr rhs) :
+    AssignNode(StoreablePtr lhs, NodePtr rhs) :
         lhs_(lhs), rhs_(rhs)
     {}
 
