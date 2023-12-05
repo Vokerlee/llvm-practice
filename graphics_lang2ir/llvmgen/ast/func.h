@@ -11,6 +11,7 @@ namespace llvmgen
 
 using FuncParamPtr = std::shared_ptr<FuncParamNode>;
 using FuncScopePtr = std::shared_ptr<FuncScopeNode>;
+using FuncDeclPtr  = std::shared_ptr<FuncDeclNode>;
 
 class FuncParamNode : public VarNode
 {
@@ -30,6 +31,68 @@ public:
 
 private:
     llvm::Argument *arg_ = nullptr;
+};
+
+
+class FuncScopeNode : public Node
+{
+public:
+    FuncScopeNode() = default;
+
+    void SetFunc(FuncDeclPtr func)
+    {
+        parent_func_ = func;
+    }
+
+    auto GetFunc() const
+    {
+        return parent_func_.lock();
+    }
+
+    auto GetParent() const
+    {
+        return parent_.lock();
+    }
+
+    void PushNode(NodePtr child)
+    {
+        children_.push_back(child);
+    }
+
+    void PushScope(FuncScopePtr child)
+    {
+        children_scopes_.push_back(child);
+    }
+
+    void AddDecl(DeclPtr decl, bool to_push = false)
+    {
+        symbol_table_[decl->GetName()] = decl;
+        if (to_push == true)
+            PushNode(decl);
+    }
+
+    DeclPtr FindName(const std::string &name) const;
+
+    llvm::Value *CodeGen(Context &ctx) override
+    {
+        for (auto &&child : children_)
+        {
+            auto bb = ctx.GetBuilder()->GetInsertBlock();
+            if (bb != nullptr && bb->getTerminator() != nullptr)
+                child->CodeGen(ctx);
+        }
+
+        return nullptr;
+    }
+
+private:
+    std::unordered_map<std::string, DeclPtr> symbol_table_ {};
+
+    std::vector<NodePtr>      children_        {};
+    std::vector<FuncScopePtr> children_scopes_ {};
+
+    std::weak_ptr<FuncScopeNode> parent_      {};
+    std::weak_ptr<FuncDeclNode>  parent_func_ {};
 };
 
 class FuncDeclNode : public DeclNode
@@ -70,67 +133,6 @@ private:
 
     std::vector<FuncParamPtr> params_;
     FuncScopePtr              body_ {};
-};
-
-class FuncScopeNode : public Node
-{
-public:
-    FuncScopeNode() = default;
-
-    void SetFunc(DeclPtr func)
-    {
-        parent_func_ = func;
-    }
-
-    auto GetFunc() const
-    {
-        return parent_func_.lock();
-    }
-
-    auto GetParent() const
-    {
-        return parent_.lock();
-    }
-
-    void PushNode(NodePtr child)
-    {
-        children_.push_back(child);
-    }
-
-    void PushScope(ScopePtr child)
-    {
-        children_scopes_.push_back(child);
-    }
-
-    void AddDecl(DeclPtr decl, bool to_push = false)
-    {
-        symbol_table_[decl->GetName()] = decl;
-        if (to_push == true)
-            PushNode(decl);
-    }
-
-    DeclPtr FindName(const std::string &name) const;
-
-    llvm::Value *CodeGen(Context &ctx) override
-    {
-        for (auto &&child : children_)
-        {
-            auto bb = ctx.GetBuilder()->GetInsertBlock();
-            if (bb != nullptr && bb->getTerminator() != nullptr)
-                child->CodeGen(ctx);
-        }
-
-        return nullptr;
-    }
-
-private:
-    std::unordered_map<std::string, DeclPtr> symbol_table_ {};
-
-    std::vector<NodePtr>      children_        {};
-    std::vector<FuncScopePtr> children_scopes_ {};
-
-    std::weak_ptr<FuncScopeNode> parent_      {};
-    std::weak_ptr<FuncDeclNode>  parent_func_ {};
 };
 
 } // namespace llvmgen
