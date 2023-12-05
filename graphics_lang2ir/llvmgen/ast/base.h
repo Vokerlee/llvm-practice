@@ -1,5 +1,5 @@
-#ifndef GRLANG_AST_AST_H
-#define GRLANG_AST_AST_H
+#ifndef GRLANG_LLVMGEN_AST_BASE_H
+#define GRLANG_LLVMGEN_AST_BASE_H
 
 #include "common/config.h"
 #include "common/macros.h"
@@ -19,6 +19,11 @@ namespace grlang
 namespace llvmgen
 {
 
+using NodePtr      = std::shared_ptr<Node>;
+using DeclPtr      = std::shared_ptr<DeclNode>;
+using StoreablePtr = std::shared_ptr<StoreableNode>;
+using BinOpPtr     = std::shared_ptr<BinOpNode>;
+
 struct Node
 {
     virtual llvm::Value *CodeGen(Context &) = 0;
@@ -28,7 +33,8 @@ struct Node
 class DeclNode : public Node
 {
 public:
-    DeclNode(const std::string &name) : name_(name)
+    DeclNode(const std::string &name) :
+        name_(name)
     {}
 
     const std::string &GetName() const
@@ -42,10 +48,37 @@ private:
     std::string name_;
 };
 
+class StoreableNode : public DeclNode
+{
+    StoreableNode(const std::string &name) : DeclNode(name)
+    {}
+    virtual void Store(Context &ctx, llvm::Value *value) = 0;
+};
+
+class AssignNode : public Node
+{
+public:
+    AsNode(StoreablePtr lhs, NodePtr rhs) :
+        lhs_(lhs), rhs_(rhs)
+    {}
+
+    llvm::Value *CodeGen(Context &ctx) override
+    {
+        lhs_->Store(ctx, rhs_->CodeGen(ctx));
+
+        return nullptr;
+    }
+
+private:
+    StoreablePtr lhs_ {};
+    NodePtr      rhs_ {};
+};
+
 class IntNode final : public Node
 {
 public:
-    IntNode(Int value) : value_(value)
+    IntNode(Int value) :
+        value_(value)
     {}
 
     auto GetVal() const
@@ -88,29 +121,29 @@ enum class BinOp
 class BinOpNode : public Node
 {
 public:
-    BinOpNode(std::shared_ptr<Node> left, BinOp op, std::shared_ptr<Node> right)
+    BinOpNode(NodePtr left, BinOp op, NodePtr right)
         : left_(left), right_(right), op_(op)
     {}
 
     llvm::Value *CodeGen(Context &ctx) override;
 
 private:
-    std::shared_ptr<Node> left_  {};
-    std::shared_ptr<Node> right_ {};
-    BinOp                 op_    {BinOp::INVALID};
+    NodePtr left_  {};
+    NodePtr right_ {};
+    BinOp   op_    {BinOp::INVALID};
 };
 
 // TODO: delete if it is unuseful
 class PrintNode : public Node
 {
 public:
-    PrintNode(std::shared_ptr<Node> expr) : expr_(expr)
+    PrintNode(NodePtr expr) : expr_(expr)
     {}
 
     llvm::Value *CodeGen(Context &ctx) override;
 
 private:
-    std::shared_ptr<Node> expr_;
+    NodePtr expr_;
 };
 
 // TODO: delete if it is unuseful
@@ -123,4 +156,4 @@ public:
 } // namespace llvmgen
 } // namespace grlang
 
-#endif // GRLANG_AST_AST_H
+#endif // GRLANG_LLVMGEN_AST_BASE_H

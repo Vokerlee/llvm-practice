@@ -1,5 +1,5 @@
-#ifndef GRLANG_AST_CONTEXT_H
-#define GRLANG_AST_CONTEXT_H
+#ifndef GRLANG_LLVMGEN_CONTEXT_H
+#define GRLANG_LLVMGEN_CONTEXT_H
 
 #include "common/config.h"
 #include "common/macros.h"
@@ -49,6 +49,11 @@ public:
         return llvm::ArrayType::get(type, size);
     }
 
+    llvm::IRBuilder<> *GetBuilder()
+    {
+        return &builder_;
+    }
+
 private:
     llvm::LLVMContext context_;
     std::unique_ptr<llvm::Module> module_;
@@ -58,4 +63,4 @@ private:
 } // namespace llvmgen
 } // namespace grlang
 
-#endif // GRLANG_AST_CONTEXT_H
+#endif // GRLANG_LLVMGEN_CONTEXT_H
