@@ -1,4 +1,5 @@
 #include "llvmgen/context.h"
+#include "llvmgen/ast/ast.h"
 
 #include <cstdlib>
 

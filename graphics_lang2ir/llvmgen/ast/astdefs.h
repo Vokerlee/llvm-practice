@@ -16,6 +16,9 @@ class BinOpNode;
 class VarNode;
 class ArrayAccessNode;
 class GlobVarNode;
+class FuncParamNode;
+class FuncDeclNode;
+class FuncScopeNode;
 
 } // namespace llvmgen
 } // namespace grlang
