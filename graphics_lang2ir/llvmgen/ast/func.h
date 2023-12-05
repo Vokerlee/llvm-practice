@@ -135,6 +135,19 @@ private:
     FuncScopePtr              body_ {};
 };
 
+class FuncCallNode : public Node
+{
+    std::weak_ptr<Node> func_decl_{};
+    std::vector<NodePtr> args_{};
+
+public:
+    FuncCallNode(NodePtr decl, const std::vector<pINode> &args = {}) :
+        func_decl_(decl), args_(args)
+    {}
+
+    llvm::Value *CodeGen(CodegenCtx &ctx) override;
+};
+
 } // namespace llvmgen
 } // namespace grlang
 
