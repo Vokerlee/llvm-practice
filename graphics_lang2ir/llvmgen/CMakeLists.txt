@@ -4,6 +4,7 @@ set(SOURCES
     ast/control_flow.cpp
     ast/binop.cpp
     ast/io.cpp
+    ast/func.cpp
 )
 
 add_library(llvmgen_impl OBJECT ${SOURCES})

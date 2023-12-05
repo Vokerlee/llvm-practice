@@ -23,7 +23,6 @@ namespace llvmgen
 using NodePtr      = std::shared_ptr<Node>;
 using DeclPtr      = std::shared_ptr<DeclNode>;
 using StoreablePtr = std::shared_ptr<StoreableNode>;
-using BinOpPtr     = std::shared_ptr<BinOpNode>;
 
 struct Node
 {
@@ -54,6 +53,7 @@ class StoreableNode : public DeclNode
 public:
     StoreableNode(const std::string &name) : DeclNode(name)
     {}
+
     virtual void Store(Context &ctx, llvm::Value *value) = 0;
 };
 

@@ -126,6 +126,9 @@ public:
     }
 
 private:
+    void CreateFuncSignature(Context &ctx);
+
+private:
     llvm::Function *func_     {};
     llvm::Type     *ret_type_ {};
 
@@ -137,21 +140,20 @@ private:
 
 class FuncCallNode : public Node
 {
-    std::weak_ptr<Node> func_decl_{};
-    std::vector<NodePtr> args_{};
-
 public:
     FuncCallNode(NodePtr decl, const std::vector<NodePtr> &args = {}) :
         func_decl_(decl), args_(args)
     {}
 
     llvm::Value *CodeGen(Context &ctx) override;
+
+private:
+    std::weak_ptr<Node>  func_decl_ {};
+    std::vector<NodePtr> args_      {};
 };
 
 class FuncRetNode : public Node
 {
-    NodePtr expr_;
-
 public:
     FuncRetNode(NodePtr expr = nullptr) :
         expr_(expr)
@@ -161,6 +163,9 @@ public:
     {
         return ctx.GetBuilder()->CreateRet(expr_->CodeGen(ctx));
     }
+
+private:
+    NodePtr expr_;
 };
 
 } // namespace llvmgen
