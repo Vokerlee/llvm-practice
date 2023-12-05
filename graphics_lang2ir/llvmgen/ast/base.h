@@ -97,26 +97,6 @@ private:
     const Int value_;
 };
 
-// TODO: delete if it is unuseful
-class PrintNode : public Node
-{
-public:
-    PrintNode(NodePtr expr) : expr_(expr)
-    {}
-
-    llvm::Value *CodeGen(Context &ctx) override;
-
-private:
-    NodePtr expr_;
-};
-
-// TODO: delete if it is unuseful
-class ScanNode : public Node
-{
-public:
-    llvm::Value *CodeGen(Context &ctx) override;
-};
-
 } // namespace llvmgen
 } // namespace grlang
 

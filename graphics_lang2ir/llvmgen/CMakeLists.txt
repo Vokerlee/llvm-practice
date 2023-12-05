@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(SOURCES ast/control_flow.cpp ast/binop.cpp)
+set(SOURCES
+    ast/control_flow.cpp
+    ast/binop.cpp
+    ast/io.cpp
+)
 
 add_library(llvmgen_impl OBJECT ${SOURCES})
 target_include_directories(llvmgen_impl PUBLIC ${GRLANG_ROOT})

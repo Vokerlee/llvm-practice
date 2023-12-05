@@ -4,6 +4,7 @@
 #include "llvmgen/ast/astdefs.h"
 #include "llvmgen/ast/base.h"
 #include "llvmgen/ast/binop.h"
+#include "llvmgen/ast/io.h"
 #include "llvmgen/ast/vars.h"
 #include "llvmgen/ast/func.h"
 #include "llvmgen/ast/control_flow.h"
