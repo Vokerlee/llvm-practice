@@ -141,11 +141,26 @@ class FuncCallNode : public Node
     std::vector<NodePtr> args_{};
 
 public:
-    FuncCallNode(NodePtr decl, const std::vector<pINode> &args = {}) :
+    FuncCallNode(NodePtr decl, const std::vector<NodePtr> &args = {}) :
         func_decl_(decl), args_(args)
     {}
 
-    llvm::Value *CodeGen(CodegenCtx &ctx) override;
+    llvm::Value *CodeGen(Context &ctx) override;
+};
+
+class FuncRetNode : public Node
+{
+    NodePtr expr_;
+
+public:
+    FuncRetNode(NodePtr expr = nullptr) :
+        expr_(expr)
+    {}
+
+    llvm::Value *CodeGen(Context &ctx) override
+    {
+        return ctx.GetBuilder()->CreateRet(expr_->CodeGen(ctx));
+    }
 };
 
 } // namespace llvmgen
