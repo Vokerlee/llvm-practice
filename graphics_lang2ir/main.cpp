@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     (void) argc;
     (void) argv;
 
-    grlang::CodegenContext ctx;
+    grlang::llvmgen::Context ctx;
 
     return EXIT_SUCCESS;
 }

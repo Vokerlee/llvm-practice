@@ -12,22 +12,16 @@
 #include <unordered_map>
 #include <vector>
 
-#include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/GenericValue.h>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
-#include <llvm/IR/Verifier.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Support/raw_ostream.h>
-
 namespace grlang
 {
 
-class CodegenContext
+namespace llvmgen
+{
+
+class Context
 {
 public:
-    CodegenContext() :
+    Context() :
         context_(),
         module_(std::make_unique<llvm::Module>("top", context_)),
         builder_(context_)
@@ -37,17 +31,20 @@ public:
         llvm::InitializeNativeTargetAsmParser();
     }
 
-    auto getIntTy()
+    NO_COPY_SEMANTIC(Context);
+    NO_MOVE_SEMANTIC(Context);
+
+    auto GetIntTy()
     {
         return builder_.getInt64Ty();
     }
 
-    auto getInt(Int val)
+    auto GetInt(Int val)
     {
         return builder_.getInt64(static_cast<uint64_t>(val));
     }
 
-    static auto getArrTy(llvm::Type *type, uint64_t size)
+    static auto GetArrTy(llvm::Type *type, uint64_t size)
     {
         return llvm::ArrayType::get(type, size);
     }
@@ -58,52 +55,108 @@ private:
     llvm::IRBuilder<> builder_;
 };
 
-// enum class BinOp
-// {
-//     INVALID,
+enum class BinOp
+{
+    INVALID,
 
-//     // Arithmetic
-//     ADD,
-//     SUB,
-//     MUL,
-//     DIV,
-//     MOD,
-//     AND,
-//     OR,
-//     XOR,
+    // Arithmetic
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    MOD,
+    AND,
+    OR,
+    XOR,
 
-//     // Comparison
-//     EQ,
-//     NEQ,
-//     GT,
-//     LT,
-//     GTE,
-//     LTE,
-// };
+    // Comparison
+    EQ,
+    NEQ,
+    GT,
+    LT,
+    GTE,
+    LTE,
+};
 
-// struct INode
-// {
-//     virtual llvm::Value *CodeGen(CodegenContext &) = 0;
-//     virtual ~INode() = default;
-// };
+struct Node
+{
+    virtual llvm::Value *CodeGen(Context &) = 0;
+    virtual ~Node() = default;
+};
 
-// class DeclNode : public INode
-// {
-// public:
-//     DeclNode(const std::string &name) : name_(name)
-//     {}
+class DeclNode : public Node
+{
+public:
+    DeclNode(const std::string &name) : name_(name)
+    {}
 
-//     const std::string &GetName() const
-//     {
-//         return name_;
-//     }
+    const std::string &GetName() const
+    {
+        return name_;
+    }
 
-//     virtual llvm::Value *CodeGen(CodegenContext &) override = 0;
+    virtual llvm::Value *CodeGen(Context &) override = 0;
 
-// private:
-//     std::string name_;
-// };
+private:
+    std::string name_;
+};
 
+class IntNode final : public Node
+{
+public:
+    IntNode(Int value) : value_(value)
+    {}
+
+    auto GetVal() const
+    {
+        return value_;
+    }
+
+    llvm::Value *CodeGen(Context &ctx) override
+    {
+        return llvm::ConstantInt::get(ctx.GetIntTy(), static_cast<uint64_t>(value_), true);
+    }
+
+private:
+    const Int value_;
+};
+
+class BinOpNode : public Node
+{
+public:
+    BinOpNode(std::shared_ptr<Node> left, BinOp op, std::shared_ptr<Node> right)
+        : left_(left), right_(right), op_(op)
+    {}
+
+    llvm::Value *CodeGen(Context &ctx) override;
+
+private:
+    std::shared_ptr<Node> left_  {};
+    std::shared_ptr<Node> right_ {};
+    BinOp                 op_    {BinOp::INVALID};
+};
+
+// TODO: delete if it is unuseful
+class PrintNode : public Node
+{
+public:
+    PrintNode(std::shared_ptr<Node> expr) : expr_(expr)
+    {}
+
+    llvm::Value *CodeGen(Context &ctx) override;
+
+private:
+    std::shared_ptr<Node> expr_;
+};
+
+// TODO: delete if it is unuseful
+class ScanNode : public Node
+{
+public:
+    llvm::Value *CodeGen(Context &ctx) override;
+};
+
+} // namespace llvmgen
 } // namespace grlang
 
 #endif // GRLANG_AST_H
