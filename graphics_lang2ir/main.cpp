@@ -1,4 +1,4 @@
-#include "ast/ast.h"
+#include "llvmgen/ast.h"
 
 #include <cstdlib>
 

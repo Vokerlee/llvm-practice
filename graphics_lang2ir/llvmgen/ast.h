@@ -1,8 +1,9 @@
-#ifndef GRLANG_AST_H
-#define GRLANG_AST_H
+#ifndef GRLANG_AST_AST_H
+#define GRLANG_AST_AST_H
 
 #include "common/config.h"
 #include "common/macros.h"
+#include "llvmgen/context.h"
 
 #include <algorithm>
 #include <cassert>
@@ -17,66 +18,6 @@ namespace grlang
 
 namespace llvmgen
 {
-
-class Context
-{
-public:
-    Context() :
-        context_(),
-        module_(std::make_unique<llvm::Module>("top", context_)),
-        builder_(context_)
-    {
-        llvm::InitializeNativeTarget();
-        llvm::InitializeNativeTargetAsmPrinter();
-        llvm::InitializeNativeTargetAsmParser();
-    }
-
-    NO_COPY_SEMANTIC(Context);
-    NO_MOVE_SEMANTIC(Context);
-
-    auto GetIntTy()
-    {
-        return builder_.getInt64Ty();
-    }
-
-    auto GetInt(Int val)
-    {
-        return builder_.getInt64(static_cast<uint64_t>(val));
-    }
-
-    static auto GetArrTy(llvm::Type *type, uint64_t size)
-    {
-        return llvm::ArrayType::get(type, size);
-    }
-
-private:
-    llvm::LLVMContext context_;
-    std::unique_ptr<llvm::Module> module_;
-    llvm::IRBuilder<> builder_;
-};
-
-enum class BinOp
-{
-    INVALID,
-
-    // Arithmetic
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    MOD,
-    AND,
-    OR,
-    XOR,
-
-    // Comparison
-    EQ,
-    NEQ,
-    GT,
-    LT,
-    GTE,
-    LTE,
-};
 
 struct Node
 {
@@ -121,6 +62,29 @@ private:
     const Int value_;
 };
 
+enum class BinOp
+{
+    INVALID,
+
+    // Arithmetic
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    MOD,
+    AND,
+    OR,
+    XOR,
+
+    // Comparison
+    EQ,
+    NEQ,
+    GT,
+    LT,
+    GTE,
+    LTE,
+};
+
 class BinOpNode : public Node
 {
 public:
@@ -159,4 +123,4 @@ public:
 } // namespace llvmgen
 } // namespace grlang
 
-#endif // GRLANG_AST_H
+#endif // GRLANG_AST_AST_H
