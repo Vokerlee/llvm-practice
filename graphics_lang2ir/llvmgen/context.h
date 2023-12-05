@@ -23,7 +23,7 @@ class Context
 public:
     Context() :
         context_(),
-        module_(std::make_unique<llvm::Module>("top", context_)),
+        module_("top", context_),
         builder_(context_)
     {
         llvm::InitializeNativeTarget();
@@ -54,9 +54,14 @@ public:
         return &builder_;
     }
 
+    auto GetModule()
+    {
+        return &module_;
+    }
+
 private:
     llvm::LLVMContext context_;
-    std::unique_ptr<llvm::Module> module_;
+    llvm::Module module_;
     llvm::IRBuilder<> builder_;
 };
 
