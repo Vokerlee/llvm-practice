@@ -6,6 +6,7 @@
 %define parse.error detailed
 %define api.value.type variant
 
+%locations
 %param {Driver *driver}
 
 %code requires {
@@ -21,6 +22,8 @@
 }
 
 %code {
+    #include "grammar/driver/driver.h"
+
     namespace yy {
         parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc, Driver *driver);
     }
@@ -65,21 +68,21 @@ GVarDecl            : VariableDeclaration                        { $$ = std::mak
 VariableDeclaration : VAR NAME COLON Type IS Expression SEMICOLON   { $$ = std::make_shared<grlang::llvmgen::VarNode>($4, $2, $6); }
                     | VAR NAME COLON Type SEMICOLON                 { $$ = std::make_shared<grlang::llvmgen::VarNode>($4, $2); }
 
-RoutineHeader       : RoutineName                                      { driver->m_curFunc = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_); }
-                    | RoutineName COLON PrimitiveType                  { driver->m_curFunc = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_, $3); }
-                    | RoutineName LP Parameters RP                     { driver->m_curFunc = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_); }
+RoutineHeader       : RoutineName                                      { driver->func_cur_ = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_); }
+                    | RoutineName COLON PrimitiveType                  { driver->func_cur_ = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_, $3); }
+                    | RoutineName LP Parameters RP                     { driver->func_cur_ = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_); }
                     | RoutineName LP Parameters RP COLON PrimitiveType
-                                                                 { driver->m_curFunc = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_, $6); }
+                                                                 { driver->func_cur_ = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_, $6); }
 
 RoutineDeclaration : RoutineHeader {
-                                     driver->scope_cur_->setFunc(driver->m_curFunc);
+                                     driver->scope_cur_->setFunc(driver->func_cur_);
                                      driver->func_params_cur_.clear();
                                    } FuncBody {
                                                 $$ = driver->scope_cur_->GetFunc();
                                               }
 
 FuncBody : IS Body END {}
-         | SEMICOLON      { driver->m_curFunc->markAsDecl(); }
+         | SEMICOLON      { driver->func_cur_->markAsDecl(); }
 
 RoutineName : ROUTINE NAME { driver->MakeGlobalScopeChild(); $$ = $2; }
 
@@ -121,14 +124,14 @@ RoutineCall : NAME LP RP { $$ = std::make_shared<grlang::llvmgen::FuncCallNode>(
 Arguments : Expression { driver->args_cur_.push_back($1); }
           | Arguments COMMA Expression { driver->args_cur_.push_back($3); }
 
-WhileLoop : WHILE Expression LOOP {driver->MakeCurScopeChild(); } Body END { $$ = std::make_shared<grlang::llvmgen::WhileNode>($2, driver->scope_cur_, driver->scope_cur_->getParent()); driver->resetScope(); }
+WhileLoop : WHILE Expression LOOP {driver->MakeCurScopeChild(); } Body END { $$ = std::make_shared<grlang::llvmgen::WhileNode>($2, driver->scope_cur_, driver->scope_cur_->GetParent()); driver->ResetScope(); }
 
 IfStatement : IF Expression TrueScope END { $$ = std::make_shared<grlang::llvmgen::IfNode>($3, $2, driver->scope_cur_); }
             | IF Expression TrueScope FalseScope { $$ = std::make_shared<grlang::llvmgen::IfNode>($3, $2, driver->scope_cur_, $4); }
 
-TrueScope : THEN {driver->MakeCurScopeChild(); } Body { $$ = driver->scope_cur_; driver->resetScope(); }
+TrueScope : THEN {driver->MakeCurScopeChild(); } Body { $$ = driver->scope_cur_; driver->ResetScope(); }
 
-FalseScope : ELSE {driver->MakeCurScopeChild(); } Body END {$$ = driver->scope_cur_; driver->resetScope(); }
+FalseScope : ELSE {driver->MakeCurScopeChild(); } Body END {$$ = driver->scope_cur_; driver->ResetScope(); }
 
 Expression : Expression OR Expression      { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::OR,  $3); }
            | Expression AND Expression     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::AND, $3); }

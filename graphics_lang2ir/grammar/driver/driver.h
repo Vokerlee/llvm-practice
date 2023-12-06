@@ -57,8 +57,8 @@ public:
 
     void CodeGen()
     {
-        auto print_func_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.getIntTy()}, false);
-        auto scan_func_type  = llvm::FunctionType::get(ctx_.getIntTy(), false);
+        auto print_func_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetIntTy()}, false);
+        auto scan_func_type  = llvm::FunctionType::get(ctx_.GetIntTy(), false);
 
         llvm::Function::Create(print_func_type, llvm::Function::ExternalLinkage,
                                grlang::llvmgen::IO_PRINT_FUNC_NAME, *ctx_.GetModule());
@@ -74,7 +74,7 @@ public:
         llvm::raw_string_ostream os(buffer);
         ctx_.GetModule()->print(os, nullptr);
         os.flush();
-        out << buf;
+        out << buffer;
     }
 
 private:
