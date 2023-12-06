@@ -114,7 +114,8 @@ private:
 class GlobVarNode : public VarNode
 {
 public:
-    GlobVarNode(VarPtr var_ptr) : VarNode(*var_ptr)
+    GlobVarNode(VarPtr var_ptr) :
+        VarNode(*var_ptr)
     {}
 
     llvm::Value *CodeGen(Context &ctx) override

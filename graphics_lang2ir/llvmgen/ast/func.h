@@ -38,6 +38,9 @@ class FuncScopeNode : public Node
 {
 public:
     FuncScopeNode() = default;
+    FuncScopeNode(FuncScopePtr par) :
+        parent_(par), parent_func_(par->parent_func_)
+    {}
 
     void SetParentFuncDecl(FuncProtPtr func)
     {
