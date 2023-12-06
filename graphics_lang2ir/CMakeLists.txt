@@ -19,11 +19,16 @@ find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
+find_package(BISON)
+find_package(FLEX)
+
 add_subdirectory(llvmgen)
+add_subdirectory(grammar)
 
 add_library(grlang_static STATIC)
 target_link_libraries(grlang_static PUBLIC
     llvmgen_impl
+    grammar_impl
 )
 
 # ----------------------------------------------------------------------------
