@@ -68,7 +68,7 @@ public:
         global_scope_->CodeGen(ctx_);
     }
 
-    void DumpIR(std::ostream &out) const
+    void DumpIR(std::ostream &out)
     {
         std::string buffer;
         llvm::raw_string_ostream os(buffer);

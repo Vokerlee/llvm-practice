@@ -1,12 +1,13 @@
 %language "c++"
 %skeleton "lalr1.cc"
 
+%locations
+
 %define parse.trace
 %define parse.lac full
 %define parse.error detailed
 %define api.value.type variant
 
-%locations
 %param {Driver *driver}
 
 %code requires {
@@ -51,7 +52,7 @@
 
 %right ELSE THEN
 
-%left EQ NOT_EQ GT LT GTE LTE
+%left EQ NEQ GT LT GTE LTE
 %left ADD SUB MUL DIV MOD OR AND XOR
 
 %%
@@ -75,28 +76,28 @@ RoutineHeader       : RoutineName                                      { driver-
                                                                  { driver->func_cur_ = std::make_shared<grlang::llvmgen::FuncProtNode>($1, driver->func_params_cur_, driver->scope_cur_, $6); }
 
 RoutineDeclaration : RoutineHeader {
-                                     driver->scope_cur_->setFunc(driver->func_cur_);
+                                     driver->scope_cur_->SetParentFuncDecl(driver->func_cur_);
                                      driver->func_params_cur_.clear();
                                    } FuncBody {
-                                                $$ = driver->scope_cur_->GetFunc();
+                                                $$ = driver->scope_cur_->GetParentFuncDecl();
                                               }
 
 FuncBody : IS Body END {}
-         | SEMICOLON      { driver->func_cur_->markAsDecl(); }
+         | SEMICOLON      { driver->func_cur_->MarkAsDecl(); }
 
 RoutineName : ROUTINE NAME { driver->MakeGlobalScopeChild(); $$ = $2; }
 
 Parameters : ParamDecl {}
            | Parameters COMMA ParamDecl {}
 
-ParamDecl : NAME COLON Type { driver->func_params_cur_.push_back(std::make_shared<grlang::llvmgen::ParamDeclNode>($3, $1)); }
+ParamDecl : NAME COLON Type { driver->func_params_cur_.push_back(std::make_shared<grlang::llvmgen::FuncParamNode>($3, $1)); }
 
 Type : PrimitiveType { $$ = $1; }
      | ArrayType     { $$ = $1; }
 
-PrimitiveType : INTEGER { $$ = driver->ctx_.getIntTy(); }
+PrimitiveType : INTEGER { $$ = driver->ctx_.GetIntTy(); }
 
-ArrayType : ARRAY LBT INT RBT PrimitiveType { $$ = grlang::llvmgen::Context::getArrTy($5, $3); }
+ArrayType : ARRAY LBT INT RBT PrimitiveType { $$ = grlang::llvmgen::Context::GetArrTy($5, $3); }
 
 Body : Statement                { driver->scope_cur_->PushNode($1); }
      | VariableDeclaration      { driver->scope_cur_->AddDecl($1, true); }
@@ -110,8 +111,8 @@ Statement : Assignment SEMICOLON       { $$ = $1; }
           | IfStatement             { $$ = $1; }
           | ReturnStatement SEMICOLON  { $$ = $1; }
 
-ReturnStatement : RETURN            { $$ = std::make_shared<grlang::llvmgen::RetNode>(); }
-                | RETURN Expression { $$ = std::make_shared<grlang::llvmgen::RetNode>($2); }
+ReturnStatement : RETURN            { $$ = std::make_shared<grlang::llvmgen::FuncRetNode>(); }
+                | RETURN Expression { $$ = std::make_shared<grlang::llvmgen::FuncRetNode>($2); }
 
 Assignment : ModPrimary ASSIGN Expression { $$ = std::make_shared<grlang::llvmgen::AssignNode>($1, $3); }
 
