@@ -12,8 +12,7 @@ llvm::Value *BinOpNode::CodeGen(Context &ctx)
     auto *rhs = right_->CodeGen(ctx);
     auto builder = ctx.GetBuilder();
 
-    switch (op_)
-    {
+    switch (op_) {
         /* Arithmetic */
         case BinOp::ADD:
             return builder->CreateAdd(lhs, rhs);

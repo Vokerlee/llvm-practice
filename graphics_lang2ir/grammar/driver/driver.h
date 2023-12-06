@@ -100,7 +100,7 @@ private:
     std::unique_ptr<yyFlexLexer>               lexer_           {};
     grlang::llvmgen::Context                   ctx_             {};
 
-    grlang::llvmgen::FuncScopePtr              global_scope_    {},
+    grlang::llvmgen::FuncScopePtr              global_scope_    {};
     grlang::llvmgen::FuncScopePtr              scope_cur_       {};
     grlang::llvmgen::FuncProtPtr               func_cur_        {};
 

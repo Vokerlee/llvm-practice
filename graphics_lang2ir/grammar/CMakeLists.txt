@@ -16,4 +16,4 @@ set(SOURCES
 )
 
 add_library(grammar_impl OBJECT ${SOURCES})
-target_include_directories(grammar_impl PUBLIC ${GRLANG_ROOT})
+target_include_directories(grammar_impl PUBLIC ${GRLANG_ROOT} ${GRLANG_BINARY_ROOT})

@@ -4,7 +4,11 @@
 
 %s COMMENT_ML
 
-%{ #include "parser.h" %}
+%{
+
+#include "parser.h"
+
+%}
 
 DIGIT                [0-9]
 
