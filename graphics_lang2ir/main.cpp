@@ -1,14 +1,18 @@
-#include "llvmgen/context.h"
-#include "llvmgen/ast/ast.h"
+#include "grammar/driver/driver.h"
 
 #include <cstdlib>
 
-int main(int argc, char *argv[])
+int main()
 {
-    (void) argc;
-    (void) argv;
+    yy::Driver driver(std::cin, std::cout);
 
-    grlang::llvmgen::Context ctx;
+    if (!driver.Parse()) {
+        std::cerr << "Parsing failed" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    driver.CodeGen();
+    driver.DumpIR(std::cout);
 
     return EXIT_SUCCESS;
 }
