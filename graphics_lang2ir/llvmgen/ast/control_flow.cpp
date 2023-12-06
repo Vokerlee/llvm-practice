@@ -6,12 +6,12 @@ namespace grlang
 namespace llvmgen
 {
 
-llvm::Value *IfNode::CodeGen(Context &ctx)
+llvm::Value *IfNode::LLVMGen(Context &ctx)
 {
     auto llvm_context = ctx.GetLLVMContext();
     auto builder      = ctx.GetBuilder();
 
-    auto cond = condition_->CodeGen(ctx);
+    auto cond = condition_->LLVMGen(ctx);
     auto cond_bool = builder->CreateBitCast(cond, builder->getInt1Ty());
 
     auto parent_func = parent_scope_.lock()->GetParentFuncDecl();
@@ -23,7 +23,7 @@ llvm::Value *IfNode::CodeGen(Context &ctx)
     builder->CreateCondBr(cond_bool, bb_true, bb_false);
 
     builder->SetInsertPoint(bb_true);
-    scope_true_->CodeGen(ctx);
+    scope_true_->LLVMGen(ctx);
 
     if (builder->GetInsertBlock()->getTerminator() == nullptr)
         builder->CreateBr(bb_cmp_end);
@@ -31,7 +31,7 @@ llvm::Value *IfNode::CodeGen(Context &ctx)
     builder->SetInsertPoint(bb_false);
 
     if (scope_false_ != nullptr)
-        scope_false_->CodeGen(ctx);
+        scope_false_->LLVMGen(ctx);
 
     if (builder->GetInsertBlock()->getTerminator() == nullptr)
         builder->CreateBr(bb_cmp_end);
@@ -41,7 +41,7 @@ llvm::Value *IfNode::CodeGen(Context &ctx)
   return nullptr;
 }
 
-llvm::Value *WhileNode::CodeGen(Context &ctx)
+llvm::Value *WhileNode::LLVMGen(Context &ctx)
 {
     auto llvm_context = ctx.GetLLVMContext();
     auto builder      = ctx.GetBuilder();
@@ -55,12 +55,12 @@ llvm::Value *WhileNode::CodeGen(Context &ctx)
     builder->CreateBr(bb_cond);
     builder->SetInsertPoint(bb_cond);
 
-    auto cond = condition_->CodeGen(ctx);
+    auto cond = condition_->LLVMGen(ctx);
     auto cond_bool = builder->CreateBitCast(cond, builder->getInt1Ty());
     builder->CreateCondBr(cond_bool, bb_body, bb_cmp_end);
 
     builder->SetInsertPoint(bb_body);
-    body_->CodeGen(ctx);
+    body_->LLVMGen(ctx);
 
     if (builder->GetInsertBlock()->getTerminator() == nullptr)
         builder->CreateBr(bb_cond);

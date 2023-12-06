@@ -28,7 +28,7 @@ public:
         arg_ = arg;
     }
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
 private:
     llvm::Argument *arg_ = nullptr;
@@ -76,13 +76,13 @@ public:
 
     DeclPtr FindName(const std::string &name) const;
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
         for (auto &&child : children_)
         {
             auto bb = ctx.GetBuilder()->GetInsertBlock();
             if (bb != nullptr && bb->getTerminator() != nullptr)
-                child->CodeGen(ctx);
+                child->LLVMGen(ctx);
         }
 
         return nullptr;
@@ -111,7 +111,7 @@ public:
 
     DEFAULT_COPY_SEMANTIC(FuncProtNode);
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
     void MarkAsDecl()
     {
@@ -148,7 +148,7 @@ public:
         func_decl_(decl), args_(args)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
 private:
     std::weak_ptr<Node>  func_decl_ {};
@@ -162,9 +162,9 @@ public:
         expr_(expr)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
-        return ctx.GetBuilder()->CreateRet(expr_->CodeGen(ctx));
+        return ctx.GetBuilder()->CreateRet(expr_->LLVMGen(ctx));
     }
 
 private:

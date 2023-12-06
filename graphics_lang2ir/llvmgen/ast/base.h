@@ -26,7 +26,7 @@ using StoreablePtr = std::shared_ptr<StoreableNode>;
 
 struct Node
 {
-    virtual llvm::Value *CodeGen(Context &) = 0;
+    virtual llvm::Value *LLVMGen(Context &) = 0;
     virtual ~Node() = default;
 };
 
@@ -42,7 +42,7 @@ public:
         return name_;
     }
 
-    virtual llvm::Value *CodeGen(Context &) override = 0;
+    virtual llvm::Value *LLVMGen(Context &) override = 0;
 
 private:
     std::string name_;
@@ -51,22 +51,23 @@ private:
 class StoreableNode : public DeclNode
 {
 public:
-    StoreableNode(const std::string &name) : DeclNode(name)
+    StoreableNode(const std::string &name) :
+        DeclNode(name)
     {}
 
     virtual void Store(Context &ctx, llvm::Value *value) = 0;
 };
 
-class AssignNode : public Node
+class AssignNode final : public Node
 {
 public:
     AssignNode(StoreablePtr lhs, NodePtr rhs) :
         lhs_(lhs), rhs_(rhs)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
-        lhs_->Store(ctx, rhs_->CodeGen(ctx));
+        lhs_->Store(ctx, rhs_->LLVMGen(ctx));
 
         return nullptr;
     }
@@ -88,7 +89,7 @@ public:
         return value_;
     }
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
         return llvm::ConstantInt::get(ctx.GetIntTy(), static_cast<uint64_t>(value_), true);
     }

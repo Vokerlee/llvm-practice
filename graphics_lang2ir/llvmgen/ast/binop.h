@@ -44,7 +44,7 @@ public:
         left_(left), right_(right), op_(op)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
 private:
     NodePtr left_  {};

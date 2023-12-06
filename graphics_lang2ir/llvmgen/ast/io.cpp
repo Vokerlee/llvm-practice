@@ -27,9 +27,9 @@ namespace grlang
 namespace llvmgen
 {
 
-llvm::Value *PrintNode::CodeGen(Context &ctx)
+llvm::Value *PrintNode::LLVMGen(Context &ctx)
 {
-    auto *value = expr_->CodeGen(ctx);
+    auto *value = expr_->LLVMGen(ctx);
 
     auto print_func = ctx.GetModule()->getFunction(IO_PRINT_FUNC_NAME);
     if (print_func == nullptr)
@@ -38,7 +38,7 @@ llvm::Value *PrintNode::CodeGen(Context &ctx)
   return ctx.GetBuilder()->CreateCall(print_func, {value});
 }
 
-llvm::Value *ScanNode::CodeGen(Context &ctx)
+llvm::Value *ScanNode::LLVMGen(Context &ctx)
 {
     auto scan_func = ctx.GetModule()->getFunction(IO_SCAN_FUNC_NAME);
     if (scan_func == nullptr)

@@ -22,7 +22,7 @@ public:
         expr_(expr)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
 private:
     NodePtr expr_;
@@ -31,7 +31,7 @@ private:
 class ScanNode : public Node
 {
 public:
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 };
 
 } // namespace llvmgen

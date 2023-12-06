@@ -6,10 +6,10 @@ namespace grlang
 namespace llvmgen
 {
 
-llvm::Value *BinOpNode::CodeGen(Context &ctx)
+llvm::Value *BinOpNode::LLVMGen(Context &ctx)
 {
-    auto *lhs = left_->CodeGen(ctx);
-    auto *rhs = right_->CodeGen(ctx);
+    auto *lhs = left_->LLVMGen(ctx);
+    auto *rhs = right_->LLVMGen(ctx);
     auto builder = ctx.GetBuilder();
 
     switch (op_) {

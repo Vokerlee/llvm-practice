@@ -32,16 +32,16 @@ public:
         ctx.GetBuilder()->CreateStore(value, alloca_);
     }
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
-        // If CodeGen() wal already called, just return its value
+        // If LLVMGen() wal already called, just return its value
         if (alloca_ != nullptr)
             return ctx.GetBuilder()->CreateLoad(type_, alloca_);
 
         alloca_ = ctx.GetBuilder()->CreateAlloca(type_);
         if (type_->isIntegerTy()) {
             if (init_expr_)
-                ctx.GetBuilder()->CreateStore(init_expr_->CodeGen(ctx), alloca_);
+                ctx.GetBuilder()->CreateStore(init_expr_->LLVMGen(ctx), alloca_);
 
             return nullptr;
         }
@@ -87,7 +87,7 @@ public:
 
     auto MakeGEP(Context &ctx)
     {
-        auto *idx = idx_->CodeGen(ctx);
+        auto *idx = idx_->LLVMGen(ctx);
         auto array = array_.lock();
 
         if (!(array->GetTy())->isArrayTy())
@@ -96,7 +96,7 @@ public:
         return ctx.GetBuilder()->CreateInBoundsGEP(array->GetTy(), array->GetAlloca(), {ctx.GetBuilder()->getInt32(0), idx});
     }
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
         return ctx.GetBuilder()->CreateLoad(array_.lock()->GetTy()->getArrayElementType(), MakeGEP(ctx));
     }
@@ -118,7 +118,7 @@ public:
         VarNode(*var_ptr)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override
+    llvm::Value *LLVMGen(Context &ctx) override
     {
         if (GetAlloca() != nullptr)
             return ctx.GetBuilder()->CreateLoad(GetTy(), GetAlloca());

@@ -11,7 +11,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    driver.CodeGen();
+    driver.LLVMGen();
     driver.DumpIR(std::cout);
 
     return EXIT_SUCCESS;

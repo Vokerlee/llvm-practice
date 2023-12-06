@@ -55,7 +55,7 @@ public:
         return !par.parse();
     }
 
-    void CodeGen()
+    void LLVMGen()
     {
         auto print_func_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetIntTy()}, false);
         auto scan_func_type  = llvm::FunctionType::get(ctx_.GetIntTy(), false);
@@ -65,7 +65,7 @@ public:
         llvm::Function::Create(scan_func_type,  llvm::Function::ExternalLinkage,
                                grlang::llvmgen::IO_SCAN_FUNC_NAME,  *ctx_.GetModule());
 
-        global_scope_->CodeGen(ctx_);
+        global_scope_->LLVMGen(ctx_);
     }
 
     void DumpIR(std::ostream &out)

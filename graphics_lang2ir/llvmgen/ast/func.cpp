@@ -8,7 +8,7 @@ namespace grlang
 namespace llvmgen
 {
 
-llvm::Value *FuncParamNode::CodeGen(Context &ctx)
+llvm::Value *FuncParamNode::LLVMGen(Context &ctx)
 {
     if (GetAlloca() != nullptr)
         return ctx.GetBuilder()->CreateLoad(GetTy(), GetAlloca());
@@ -43,7 +43,7 @@ void FuncProtNode::CreateFuncSignature(Context &ctx)
         params_[i]->SetArg(func_->getArg(i));
 }
 
-llvm::Value *FuncProtNode::CodeGen(Context &ctx)
+llvm::Value *FuncProtNode::LLVMGen(Context &ctx)
 {
     CreateFuncSignature(ctx);
 
@@ -55,21 +55,21 @@ llvm::Value *FuncProtNode::CodeGen(Context &ctx)
 
     // Load all passed arguments in teh start of the function
     for (auto &&param : params_)
-        param->CodeGen(ctx);
+        param->LLVMGen(ctx);
 
-    body_->CodeGen(ctx);
+    body_->LLVMGen(ctx);
     ctx.GetBuilder()->ClearInsertionPoint();
 
     return nullptr;
 }
 
-llvm::Value *FuncCallNode::CodeGen(Context &ctx)
+llvm::Value *FuncCallNode::LLVMGen(Context &ctx)
 {
     auto decl = std::dynamic_pointer_cast<FuncProtNode>(func_decl_.lock());
 
     std::vector<llvm::Value *> vals;
     for (auto &&arg : args_)
-        vals.push_back(arg->CodeGen(ctx));
+        vals.push_back(arg->LLVMGen(ctx));
 
     auto *func = decl->GetFunc();
 

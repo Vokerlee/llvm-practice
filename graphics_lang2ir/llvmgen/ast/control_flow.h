@@ -17,7 +17,7 @@ public:
         parent_scope_(par), condition_(cond), scope_true_(scope_true), scope_false_(scope_false)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
 private:
     std::weak_ptr<FuncScopeNode> parent_scope_;
@@ -34,7 +34,7 @@ public:
         parent_scope_(parent_scope), condition_(cond), body_(body)
     {}
 
-    llvm::Value *CodeGen(Context &ctx) override;
+    llvm::Value *LLVMGen(Context &ctx) override;
 
 private:
     std::weak_ptr<FuncScopeNode> parent_scope_;
