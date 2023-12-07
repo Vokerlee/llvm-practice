@@ -7,6 +7,7 @@ is
     v1 := gv1 * v1;
 
     print v1;
+    print(sgl_rand());
 
     return 0;
 end

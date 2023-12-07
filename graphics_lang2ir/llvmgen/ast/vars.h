@@ -35,19 +35,23 @@ public:
     llvm::Value *LLVMGen(Context &ctx) override
     {
         // If LLVMGen() wal already called, just return its value
-        if (alloca_ != nullptr)
-            return ctx.GetBuilder()->CreateLoad(type_, alloca_);
+        if (alloca_ != nullptr) {
+            if (type_->isIntegerTy())
+                return ctx.GetBuilder()->CreateLoad(type_, alloca_);
+            else if (type_->isArrayTy())
+                return alloca_;
+        }
 
         alloca_ = ctx.GetBuilder()->CreateAlloca(type_);
+
         if (type_->isIntegerTy()) {
             if (init_expr_)
                 ctx.GetBuilder()->CreateStore(init_expr_->LLVMGen(ctx), alloca_);
 
             return nullptr;
-        }
-
-        if (type_->isArrayTy())
+        } else if (type_->isArrayTy()) {
             return nullptr;
+        }
 
         throw std::runtime_error("Invalid type");
     }
