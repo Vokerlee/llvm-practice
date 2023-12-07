@@ -15,35 +15,35 @@ llvm::Value *BinOpNode::LLVMGen(Context &ctx)
     switch (op_) {
         // Arithmetic
         case BinOp::ADD:
-            return builder->CreateAdd(lhs, rhs);
+            return builder->CreateAdd(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::SUB:
-            return builder->CreateSub(lhs, rhs);
+            return builder->CreateSub(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::MUL:
-            return builder->CreateMul(lhs, rhs);
+            return builder->CreateMul(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::DIV:
-            return builder->CreateSDiv(lhs, rhs);
+            return builder->CreateSDiv(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::MOD:
-            return builder->CreateSRem(lhs, rhs);
+            return builder->CreateSRem(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::AND:
-            return builder->CreateAnd(lhs, rhs);
+            return builder->CreateAnd(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::OR:
-            return builder->CreateOr(lhs, rhs);
+            return builder->CreateOr(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
         case BinOp::XOR:
-            return builder->CreateXor(lhs, rhs);
+            return builder->CreateXor(builder->CreateZExt(lhs, ctx.GetIntTy()), builder->CreateZExt(rhs, ctx.GetIntTy()));
 
         // Comparison
         case BinOp::EQ:
-            return builder->CreateZExt(builder->CreateICmpEQ(lhs, rhs), ctx.GetIntTy());
+            return builder->CreateICmpEQ(lhs, rhs);
         case BinOp::NEQ:
-            return builder->CreateZExt(builder->CreateICmpNE(lhs, rhs), ctx.GetIntTy());
+            return builder->CreateICmpNE(lhs, rhs);
         case BinOp::GT:
-            return builder->CreateZExt(builder->CreateICmpSGT(lhs, rhs), ctx.GetIntTy());
+            return builder->CreateICmpSGT(lhs, rhs);
         case BinOp::LT:
-            return builder->CreateZExt(builder->CreateICmpSLT(lhs, rhs), ctx.GetIntTy());
+            return builder->CreateICmpSLT(lhs, rhs);
         case BinOp::GTE:
-            return builder->CreateZExt(builder->CreateICmpSGE(lhs, rhs), ctx.GetIntTy());
+            return builder->CreateICmpSGE(lhs, rhs);
         case BinOp::LTE:
-            return builder->CreateZExt(builder->CreateICmpSLE(lhs, rhs), ctx.GetIntTy());
+            return builder->CreateICmpSLE(lhs, rhs);
         default:
             throw std::runtime_error("Unrecognized binary operation type");
             return nullptr;
