@@ -13,8 +13,8 @@ namespace llvmgen
 class IfNode : public Node
 {
 public:
-    IfNode(FuncScopePtr par, NodePtr cond, FuncScopePtr scope_true, FuncScopePtr scope_false = nullptr) :
-        parent_scope_(par), condition_(cond), scope_true_(scope_true), scope_false_(scope_false)
+    IfNode(FuncScopePtr parent_scope, NodePtr cond, FuncScopePtr scope_true, FuncScopePtr scope_false = nullptr) :
+        parent_scope_(parent_scope), condition_(cond), scope_true_(scope_true), scope_false_(scope_false)
     {}
 
     llvm::Value *LLVMGen(Context &ctx) override;

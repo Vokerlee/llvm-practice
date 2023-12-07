@@ -85,15 +85,15 @@ private:
 
     void MakeCurScopeChild()
     {
-        auto par = scope_cur_;
-        scope_cur_ = std::make_shared<grlang::llvmgen::FuncScopeNode>(par);
-        par->PushScope(scope_cur_);
+        auto parent = scope_cur_;
+        scope_cur_ = std::make_shared<grlang::llvmgen::FuncScopeNode>(parent);
+        parent->PushScope(scope_cur_);
     }
 
     void ResetScope()
     {
-        auto par = scope_cur_->GetParent();
-        scope_cur_ = par == nullptr ? global_scope_ : par;
+        auto parent = scope_cur_->GetParent();
+        scope_cur_ = parent == nullptr ? global_scope_ : parent;
     }
 
 private:

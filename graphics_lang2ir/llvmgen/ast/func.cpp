@@ -78,19 +78,22 @@ llvm::Value *FuncCallNode::LLVMGen(Context &ctx)
 
 DeclPtr FuncScopeNode::FindName(const std::string &name) const
 {
+    // Search in current scope
     auto it = symbol_table_.find(name);
     if (it != symbol_table_.end())
         return it->second;
 
+    // Check if name is a current function name (if it is not a global scope)
     auto parent_func = parent_func_.lock();
     if (parent_func != nullptr && name == parent_func->GetName())
         return parent_func;
 
     parent_func.reset();
 
-    auto parent_ptr = parent_.lock();
-    if (parent_ptr != nullptr)
-        return parent_ptr->FindName(name); // find in upper scope
+    // Search in upper scopes (if it is not a global scope)
+    auto parent = parent_.lock();
+    if (parent != nullptr)
+        return parent->FindName(name);
 
     std::ostringstream ss;
     ss << "Can't find symbol with name '" << name << '\'';

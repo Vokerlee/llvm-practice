@@ -4,6 +4,8 @@
 #include "llvmgen/ast/base.h"
 #include "llvmgen/ast/vars.h"
 
+#include <iostream>
+
 namespace grlang
 {
 
@@ -38,8 +40,8 @@ class FuncScopeNode : public Node
 {
 public:
     FuncScopeNode() = default;
-    FuncScopeNode(FuncScopePtr par) :
-        parent_(par), parent_func_(par->parent_func_)
+    FuncScopeNode(FuncScopePtr parent) :
+        parent_(parent), parent_func_(parent->parent_func_)
     {}
 
     void SetParentFuncDecl(FuncProtPtr func)
@@ -81,7 +83,7 @@ public:
         for (auto &&child : children_)
         {
             auto bb = ctx.GetBuilder()->GetInsertBlock();
-            if (bb != nullptr && bb->getTerminator() != nullptr)
+            if (bb == nullptr || bb->getTerminator() == nullptr)
                 child->LLVMGen(ctx);
         }
 

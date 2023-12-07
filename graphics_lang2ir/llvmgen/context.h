@@ -39,12 +39,7 @@ public:
         return builder_.getInt64Ty();
     }
 
-    auto GetInt(Int val)
-    {
-        return builder_.getInt64(static_cast<uint64_t>(val));
-    }
-
-    static auto GetArrTy(llvm::Type *type, uint64_t size)
+    static auto GetArrTy(llvm::Type *type, size_t size)
     {
         return llvm::ArrayType::get(type, size);
     }

@@ -61,7 +61,6 @@ COMMENT_SL           "//".*"\n"
 "]"                  return yy::parser::token_type::RBT;
 
 {INT}                return yy::parser::token_type::INT;
-{NAME}               return yy::parser::token_type::NAME;
 
 "if"                 return yy::parser::token_type::IF;
 "then"               return yy::parser::token_type::THEN;
@@ -79,6 +78,8 @@ COMMENT_SL           "//".*"\n"
 
 "?"                  return yy::parser::token_type::SCAN;
 "print"              return yy::parser::token_type::PRINT;
+
+{NAME}               return yy::parser::token_type::NAME;
 
 .                    return yy::parser::token_type::YYerror;
 

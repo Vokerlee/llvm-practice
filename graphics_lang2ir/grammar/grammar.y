@@ -41,9 +41,9 @@
 
 %nterm<grlang::llvmgen::DeclPtr>  RoutineDecl;
 %nterm<std::string>               RoutineName;
-%nterm<grlang::llvmgen::NodePtr>  Program     Parameters     ParamDecl Statement ReturnStatement
-                                  Assignment  RoutineCall    Arguments WhileStatement IfStatement
-                                  Expression  ExpressionTerm Primary;
+%nterm<grlang::llvmgen::NodePtr>  Program     Parameters     ParamDecl   Statement      ReturnStatement
+                                  Assignment  RoutineCall    Arguments   WhileStatement IfStatement
+                                  Expression  ExpressionCMP  ExpressionT ExpressionP    Primary;
 
 %nterm <grlang::llvmgen::VarPtr>         VarDecl GlobalVarDecl;
 %nterm <grlang::llvmgen::StoreablePtr>   ModPrimary;
@@ -177,23 +177,27 @@ ArrayType           : ARRAY LBT INT RBT PrimitiveType                   { $$ = g
 
 /* Expression description */
 
-Expression          : Expression OR  Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::OR,  $3); }
-                    | Expression AND Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::AND, $3); }
-                    | Expression XOR Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::XOR, $3); }
-                    | Expression EQ  Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::EQ,  $3); }
-                    | Expression NEQ Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::NEQ, $3); }
-                    | Expression GT  Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::GT,  $3); }
-                    | Expression LT  Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::LT,  $3); }
-                    | Expression LTE Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::LTE, $3); }
-                    | Expression GTE Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::GTE, $3); }
-                    | Expression ADD Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::ADD, $3); }
-                    | Expression SUB Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::SUB, $3); }
-                    | Expression MUL Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::MUL, $3); }
-                    | Expression DIV Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::DIV, $3); }
-                    | Expression MOD Expression                         { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::MOD, $3); }
-                    | ExpressionTerm                                    { $$ = $1; }
+Expression          : ExpressionCMP ADD Expression                      { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::ADD, $3); }
+                    | ExpressionCMP SUB Expression                      { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::SUB, $3); }
+                    | ExpressionCMP                                     { $$ = $1; }
 
-ExpressionTerm      : LP Expression RP                                  { $$ = $2; }
+ExpressionCMP       : ExpressionT EQ  ExpressionCMP                     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::EQ,  $3); }
+                    | ExpressionT NEQ ExpressionCMP                     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::NEQ, $3); }
+                    | ExpressionT GT  ExpressionCMP                     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::GT,  $3); }
+                    | ExpressionT LT  ExpressionCMP                     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::LT,  $3); }
+                    | ExpressionT LTE ExpressionCMP                     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::LTE, $3); }
+                    | ExpressionT GTE ExpressionCMP                     { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::GTE, $3); }
+                    | ExpressionT                                       { $$ = $1; }
+
+ExpressionT         : ExpressionP OR  ExpressionT                       { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::OR,  $3); }
+                    | ExpressionP AND ExpressionT                       { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::AND, $3); }
+                    | ExpressionP XOR ExpressionT                       { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::XOR, $3); }
+                    | ExpressionP MUL ExpressionT                       { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::MUL, $3); }
+                    | ExpressionP DIV ExpressionT                       { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::DIV, $3); }
+                    | ExpressionP MOD ExpressionT                       { $$ = std::make_shared<grlang::llvmgen::BinOpNode>($1, grlang::llvmgen::BinOp::MOD, $3); }
+                    | ExpressionP                                       { $$ = $1; }
+
+ExpressionP         : LP Expression RP                                  { $$ = $2; }
                     | Primary                                           { $$ = $1; }
 
 Primary             : INT                                               { $$ = std::make_shared<grlang::llvmgen::IntNode>($1); }

@@ -81,8 +81,8 @@ private:
 class ArrayAccessNode : public StoreableNode
 {
 public:
-    ArrayAccessNode(const std::string &name, VarPtr var_ptr, NodePtr idx)
-        : StoreableNode(name), array_(var_ptr), idx_(idx)
+    ArrayAccessNode(const std::string &name, VarPtr var_ptr, NodePtr idx) :
+        StoreableNode(name), array_(var_ptr), idx_(idx)
     {}
 
     auto MakeGEP(Context &ctx)
