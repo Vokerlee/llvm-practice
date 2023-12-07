@@ -41,4 +41,4 @@ target_link_libraries(grlang_static PUBLIC
 
 add_executable(grlang main.cpp)
 target_include_directories(grlang PUBLIC ${GRLANG_ROOT} ${LLVM_INCLUDE_DIRS})
-target_link_libraries(grlang PUBLIC grlang_static LLVM ${SDL2_LIBRARIES})
+target_link_libraries(grlang PUBLIC grlang_static LLVM)

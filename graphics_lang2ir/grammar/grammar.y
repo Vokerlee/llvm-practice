@@ -126,7 +126,7 @@ Statement           : Assignment                     SEMICOLON          { $$ = $
                     | PRINT      Expression          SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::PrintNode>($2); }
                     | SGL_SRAND  Expression          SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLSrandNode>($2); }
                     | SGL_INIT   LP Expression COMMA
-                                    Expression RP    SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLInitNode>(); }
+                                    Expression RP    SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLInitNode>($3, $5); }
                     | SGL_CLOSE  LP RP               SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLCloseNode>(); }
                     | SGL_UPDATE LP ModPrimary RP    SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLUpdateNode>($3); }
                     | WhileStatement                                    { $$ = $1; }

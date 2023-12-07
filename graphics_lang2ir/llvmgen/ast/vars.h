@@ -124,8 +124,12 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        if (GetAlloca() != nullptr)
-            return ctx.GetBuilder()->CreateLoad(GetTy(), GetAlloca());
+        if (GetAlloca() != nullptr) {
+            if (GetTy()->isIntegerTy())
+                return ctx.GetBuilder()->CreateLoad(GetTy(), GetAlloca());
+            else if (GetTy()->isArrayTy())
+                return GetAlloca();
+        }
 
         ctx.GetModule()->getOrInsertGlobal(GetName(), GetTy());
         auto *ptr = ctx.GetModule()->getNamedGlobal(GetName());

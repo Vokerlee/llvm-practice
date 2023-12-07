@@ -58,14 +58,26 @@ public:
 class SGLInitNode : public Node
 {
 public:
+    SGLInitNode(NodePtr expr1, NodePtr expr2) :
+        expr1_(expr1),
+        expr2_(expr2)
+    {}
+
     llvm::Value *LLVMGen(Context &ctx) override
     {
+        auto *value1 = expr1_->LLVMGen(ctx);
+        auto *value2 = expr2_->LLVMGen(ctx);
+
         auto func = ctx.GetModule()->getFunction(STDLIB_SGL_INIT_FUNC_NAME);
         if (func == nullptr)
             throw std::runtime_error{"Cannot find sgl_initialize() function"};
 
-        return ctx.GetBuilder()->CreateCall(func);
+        return ctx.GetBuilder()->CreateCall(func, {value1, value2});
     }
+
+private:
+    NodePtr expr1_;
+    NodePtr expr2_;
 };
 
 class SGLCloseNode : public Node
