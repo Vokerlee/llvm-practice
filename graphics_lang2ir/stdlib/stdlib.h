@@ -18,7 +18,7 @@ extern "C" void __sgl_update_(int pixel_buffer[SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEF
 extern "C" int  __sgl_rand_();
 extern "C" void __sgl_srand_(int seed);
 
-extern "C" void __sgl_initialize_();
+extern "C" void __sgl_initialize_(int width, int height);
 extern "C" void __sgl_close_();
 
 #endif // GRLANG_STDLIB_STDLIB_H

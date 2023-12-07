@@ -60,6 +60,7 @@ public:
     {
         auto void_int_type  = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetIntTy()}, false);
         auto int_void_type  = llvm::FunctionType::get(ctx_.GetIntTy(), false);
+        auto void_2int_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetIntTy(), ctx_.GetIntTy()}, false);
         auto void_void_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), false);
         auto void_ptr_type  = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetBuilder()->getPtrTy()}, false);
 
@@ -68,7 +69,7 @@ public:
         llvm::Function::Create(int_void_type,  llvm::Function::ExternalLinkage,
                                grlang::llvmgen::STDLIB_SCAN_FUNC_NAME,       *ctx_.GetModule());
 
-        llvm::Function::Create(void_void_type, llvm::Function::ExternalLinkage,
+        llvm::Function::Create(void_2int_type, llvm::Function::ExternalLinkage,
                                grlang::llvmgen::STDLIB_SGL_INIT_FUNC_NAME,   *ctx_.GetModule());
         llvm::Function::Create(void_void_type, llvm::Function::ExternalLinkage,
                                grlang::llvmgen::STDLIB_SGL_CLOSE_FUNC_NAME,  *ctx_.GetModule());

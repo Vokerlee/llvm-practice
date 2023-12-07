@@ -12,7 +12,7 @@ static SDL_Window   *WINDOW   = NULL;
 static SDL_Texture  *TEXTURE  = NULL;
 static Uint32        N_TICKS  = 0;
 
-extern "C" void __sgl_initialize_()
+extern "C" void __sgl_initialize_(int width, int height)
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -20,7 +20,7 @@ extern "C" void __sgl_initialize_()
         return;
     }
 
-    WINDOW = SDL_CreateWindow("Game of life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SGL_WIDTH_DEFAULT, SGL_HEIGHT_DEFAULT, 0);
+    WINDOW = SDL_CreateWindow("Game of life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     if (WINDOW == NULL)
     {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -34,7 +34,7 @@ extern "C" void __sgl_initialize_()
         return;
     }
 
-    TEXTURE = SDL_CreateTexture(RENDERER, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SGL_WIDTH_DEFAULT, SGL_HEIGHT_DEFAULT);
+    TEXTURE = SDL_CreateTexture(RENDERER, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (TEXTURE == NULL)
     {
         fprintf(stderr, "SDL_CreateTexture Error: %s\n", SDL_GetError());

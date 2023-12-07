@@ -121,16 +121,17 @@ Body                : Statement                                         { driver
                     | Body Statement                                    { driver->scope_cur_->PushNode($2); }
                     | Body VarDecl                                      { driver->scope_cur_->AddDecl($2, true); }
 
-Statement           : Assignment                  SEMICOLON             { $$ = $1; }
-                    | RoutineCall                 SEMICOLON             { $$ = $1; }
-                    | PRINT      Expression       SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::PrintNode>($2); }
-                    | SGL_SRAND  Expression       SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLSrandNode>($2); }
-                    | SGL_INIT   LP RP            SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLInitNode>(); }
-                    | SGL_CLOSE  LP RP            SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLCloseNode>(); }
-                    | SGL_UPDATE LP ModPrimary RP SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLUpdateNode>($3); }
+Statement           : Assignment                     SEMICOLON          { $$ = $1; }
+                    | RoutineCall                    SEMICOLON          { $$ = $1; }
+                    | PRINT      Expression          SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::PrintNode>($2); }
+                    | SGL_SRAND  Expression          SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLSrandNode>($2); }
+                    | SGL_INIT   LP Expression COMMA
+                                    Expression RP    SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLInitNode>(); }
+                    | SGL_CLOSE  LP RP               SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLCloseNode>(); }
+                    | SGL_UPDATE LP ModPrimary RP    SEMICOLON          { $$ = std::make_shared<grlang::llvmgen::SGLUpdateNode>($3); }
                     | WhileStatement                                    { $$ = $1; }
                     | IfStatement                                       { $$ = $1; }
-                    | ReturnStatement             SEMICOLON             { $$ = $1; }
+                    | ReturnStatement                SEMICOLON          { $$ = $1; }
 
 Assignment          : ModPrimary ASSIGN Expression                      { $$ = std::make_shared<grlang::llvmgen::AssignNode>($1, $3); }
 
