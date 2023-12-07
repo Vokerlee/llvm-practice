@@ -91,7 +91,7 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        return llvm::ConstantInt::get(ctx.GetIntTy(), static_cast<uint64_t>(value_), true);
+        return llvm::ConstantInt::get(ctx.GetIntTy(), static_cast<uint32_t>(value_), true);
     }
 
 private:

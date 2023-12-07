@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.13)
 set(SOURCES
     ast/control_flow.cpp
     ast/binop.cpp
-    ast/io.cpp
     ast/func.cpp
 )
 

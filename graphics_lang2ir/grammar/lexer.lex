@@ -78,6 +78,11 @@ COMMENT_SL           "//".*"\n"
 
 "?"                  return yy::parser::token_type::SCAN;
 "print"              return yy::parser::token_type::PRINT;
+"sgl_update"         return yy::parser::token_type::SGL_UPDATE;
+"sgl_rand"           return yy::parser::token_type::SGL_RAND;
+"sgl_srand"          return yy::parser::token_type::SGL_SRAND;
+"sgl_initialize"     return yy::parser::token_type::SGL_INIT;
+"sgl_close"          return yy::parser::token_type::SGL_CLOSE;
 
 {NAME}               return yy::parser::token_type::NAME;
 

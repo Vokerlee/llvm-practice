@@ -22,6 +22,14 @@ class FuncScopeNode;
 class IfNode;
 class WhileNode;
 
+class PrintNode;
+class ScanNode;
+class SGLInitNode;
+class SGLCloseNode;
+class SGLRandNode;
+class SGLSrandNode;
+class SGLUpdateNode;
+
 } // namespace llvmgen
 } // namespace grlang
 

@@ -12,6 +12,7 @@ llvm::Value *IfNode::LLVMGen(Context &ctx)
     auto builder      = ctx.GetBuilder();
 
     auto cond = condition_->LLVMGen(ctx);
+    // Usually sizeof(grlang::Int) * 8 bit, so need to cast
     auto cond_bool = builder->CreateBitCast(cond, builder->getInt1Ty());
 
     auto parent_func = parent_scope_.lock()->GetParentFuncDecl();
@@ -56,6 +57,7 @@ llvm::Value *WhileNode::LLVMGen(Context &ctx)
     builder->SetInsertPoint(bb_cond);
 
     auto cond = condition_->LLVMGen(ctx);
+    // Usually sizeof(grlang::Int) * 8 bit, so need to cast
     auto cond_bool = builder->CreateBitCast(cond, builder->getInt1Ty());
     builder->CreateCondBr(cond_bool, bb_body, bb_cmp_end);
 

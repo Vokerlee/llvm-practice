@@ -32,12 +32,13 @@
 
 %token <std::string> NAME
 %token <int> INT
-%token ADD     SUB    MUL       DIV  MOD  OR     AND
-       XOR     GT     LT        GTE  LTE  EQ     NEQ
-       COMMA   COLON  SEMICOLON LP   RP   LB     RB
-       LBT     RBT    ASSIGN    IF   THEN ELSE   WHILE
-       ROUTINE VAR    IS        LOOP END  RETURN ARRAY
-       INTEGER SCAN   PRINT
+%token ADD     SUB    MUL       DIV      MOD       OR         AND
+       XOR     GT     LT        GTE      LTE       EQ         NEQ
+       COMMA   COLON  SEMICOLON LP       RP        LB         RB
+       LBT     RBT    ASSIGN    IF       THEN      ELSE       WHILE
+       ROUTINE VAR    IS        LOOP     END       RETURN     ARRAY
+       INTEGER SCAN   PRINT     SGL_RAND SGL_SRAND SGL_UPDATE SGL_INIT
+       SGL_CLOSE
 
 %nterm<grlang::llvmgen::DeclPtr>  RoutineDecl;
 %nterm<std::string>               RoutineName;
@@ -120,12 +121,16 @@ Body                : Statement                                         { driver
                     | Body Statement                                    { driver->scope_cur_->PushNode($2); }
                     | Body VarDecl                                      { driver->scope_cur_->AddDecl($2, true); }
 
-Statement           : Assignment SEMICOLON                              { $$ = $1; }
-                    | RoutineCall SEMICOLON                             { $$ = $1; }
-                    | PRINT Expression SEMICOLON                        { $$ = std::make_shared<grlang::llvmgen::PrintNode>($2); }
+Statement           : Assignment                  SEMICOLON             { $$ = $1; }
+                    | RoutineCall                 SEMICOLON             { $$ = $1; }
+                    | PRINT      Expression       SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::PrintNode>($2); }
+                    | SGL_SRAND  Expression       SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLSrandNode>($2); }
+                    | SGL_INIT   LP RP            SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLInitNode>(); }
+                    | SGL_CLOSE  LP RP            SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLCloseNode>(); }
+                    | SGL_UPDATE LP ModPrimary RP SEMICOLON             { $$ = std::make_shared<grlang::llvmgen::SGLUpdateNode>($3); }
                     | WhileStatement                                    { $$ = $1; }
                     | IfStatement                                       { $$ = $1; }
-                    | ReturnStatement SEMICOLON                         { $$ = $1; }
+                    | ReturnStatement             SEMICOLON             { $$ = $1; }
 
 Assignment          : ModPrimary ASSIGN Expression                      { $$ = std::make_shared<grlang::llvmgen::AssignNode>($1, $3); }
 
@@ -203,6 +208,7 @@ ExpressionP         : LP Expression RP                                  { $$ = $
 Primary             : INT                                               { $$ = std::make_shared<grlang::llvmgen::IntNode>($1); }
                     | ModPrimary                                        { $$ = $1; }
                     | SCAN                                              { $$ = std::make_shared<grlang::llvmgen::ScanNode>(); }
+                    | SGL_RAND LP RP                                    { $$ = std::make_shared<grlang::llvmgen::SGLRandNode>(); }
                     | RoutineCall                                       { $$ = $1; }
 
 ModPrimary          : NAME                                              {

@@ -2,6 +2,7 @@
 #define GRLANG_GRAMMAR_DRIVER_DRIVER_H
 
 #include "llvmgen/ast/ast.h"
+#include "stdlib/stdlib.h"
 #include "parser.h"
 
 #include <algorithm>
@@ -57,13 +58,26 @@ public:
 
     void LLVMGen()
     {
-        auto print_func_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetIntTy()}, false);
-        auto scan_func_type  = llvm::FunctionType::get(ctx_.GetIntTy(), false);
+        auto void_int_type  = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetIntTy()}, false);
+        auto int_void_type  = llvm::FunctionType::get(ctx_.GetIntTy(), false);
+        auto void_void_type = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), false);
+        auto void_ptr_type  = llvm::FunctionType::get(ctx_.GetBuilder()->getVoidTy(), {ctx_.GetBuilder()->getPtrTy()}, false);
 
-        llvm::Function::Create(print_func_type, llvm::Function::ExternalLinkage,
-                               grlang::llvmgen::IO_PRINT_FUNC_NAME, *ctx_.GetModule());
-        llvm::Function::Create(scan_func_type,  llvm::Function::ExternalLinkage,
-                               grlang::llvmgen::IO_SCAN_FUNC_NAME,  *ctx_.GetModule());
+        llvm::Function::Create(void_int_type,  llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_PRINT_FUNC_NAME,      *ctx_.GetModule());
+        llvm::Function::Create(int_void_type,  llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_SCAN_FUNC_NAME,       *ctx_.GetModule());
+
+        llvm::Function::Create(void_void_type, llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_SGL_INIT_FUNC_NAME,   *ctx_.GetModule());
+        llvm::Function::Create(void_void_type, llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_SGL_CLOSE_FUNC_NAME,  *ctx_.GetModule());
+        llvm::Function::Create(int_void_type,  llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_SGL_RAND_FUNC_NAME,   *ctx_.GetModule());
+        llvm::Function::Create(void_int_type,  llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_SGL_SRAND_FUNC_NAME,  *ctx_.GetModule());
+        llvm::Function::Create(void_ptr_type,  llvm::Function::ExternalLinkage,
+                               grlang::llvmgen::STDLIB_SGL_UPDATE_FUNC_NAME, *ctx_.GetModule());
 
         global_scope_->LLVMGen(ctx_);
     }

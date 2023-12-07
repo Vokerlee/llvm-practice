@@ -14,8 +14,8 @@
 namespace grlang
 {
 
-using Int  = int64_t;
-using Uint = uint64_t;
+using Int  = int32_t;
+using Uint = uint32_t;
 
 }; // grlang
 

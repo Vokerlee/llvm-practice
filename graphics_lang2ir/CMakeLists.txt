@@ -24,6 +24,7 @@ find_package(FLEX)
 
 add_subdirectory(llvmgen)
 add_subdirectory(grammar)
+add_subdirectory(stdlib)
 
 add_library(grlang_static STATIC)
 target_link_libraries(grlang_static PUBLIC

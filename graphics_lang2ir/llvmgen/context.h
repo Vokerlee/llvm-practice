@@ -36,7 +36,7 @@ public:
 
     auto GetIntTy()
     {
-        return builder_.getInt64Ty();
+        return builder_.getInt32Ty();
     }
 
     static auto GetArrTy(llvm::Type *type, size_t size)
