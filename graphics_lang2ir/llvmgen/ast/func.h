@@ -166,7 +166,8 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        return ctx.GetBuilder()->CreateRet(expr_->LLVMGen(ctx));
+        auto *expr = expr_ ? expr_->LLVMGen(ctx) : nullptr;
+        return ctx.GetBuilder()->CreateRet(expr);
     }
 
 private:
