@@ -13,7 +13,7 @@ output_ll_file=${src_file_noext}.ll
 ./${build_path}/bin/grlang < ${src_file} > ${output_path}/${output_ll_file}
 
 output_asm_file=${src_file_noext}.s
-llc ${output_path}/${output_ll_file} -o ${output_path}/${output_asm_file}
+llc ${output_path}/${output_ll_file} -O0 -o ${output_path}/${output_asm_file}
 
 output_obj_file=${src_file_noext}.o
 clang++ -c ${output_path}/${output_asm_file} -o ${output_path}/${output_obj_file}

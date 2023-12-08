@@ -93,12 +93,12 @@ public:
     }
 
 private:
-    void MakeGlobalScopeChild()
+    void InheritGlobalScope()
     {
         scope_cur_ = std::make_shared<grlang::llvmgen::FuncScopeNode>(global_scope_);
     }
 
-    void MakeCurScopeChild()
+    void InheritCurScope()
     {
         auto parent = scope_cur_;
         scope_cur_ = std::make_shared<grlang::llvmgen::FuncScopeNode>(parent);

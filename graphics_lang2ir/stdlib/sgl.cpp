@@ -12,6 +12,9 @@ static SDL_Window   *WINDOW   = NULL;
 static SDL_Texture  *TEXTURE  = NULL;
 static Uint32        N_TICKS  = 0;
 
+static int WINDOW_WIDTH  = 0;
+static int WINDOW_HEIGHT = 0;
+
 extern "C" void __sgl_initialize_(int width, int height)
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -19,7 +22,7 @@ extern "C" void __sgl_initialize_(int width, int height)
         return;
     }
 
-    WINDOW = SDL_CreateWindow("Game of life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
+    WINDOW = SDL_CreateWindow("Graphics interface", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     if (WINDOW == NULL) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         return;
@@ -39,6 +42,9 @@ extern "C" void __sgl_initialize_(int width, int height)
 
     SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 0);
     SDL_RenderClear(RENDERER);
+
+    WINDOW_WIDTH  = width;
+    WINDOW_HEIGHT = height;
 
     srand(time(NULL));
 }
@@ -73,7 +79,7 @@ static void __sgl_flush_()
 
 extern "C" void __sgl_update_(int pixel_buffer[SGL_HEIGHT_DEFAULT][SGL_WIDTH_DEFAULT])
 {
-    SDL_UpdateTexture(TEXTURE, NULL, pixel_buffer, SGL_WIDTH_DEFAULT * sizeof(int));
+    SDL_UpdateTexture(TEXTURE, NULL, pixel_buffer, WINDOW_WIDTH * sizeof(int));
     SDL_RenderCopy(RENDERER, TEXTURE, NULL, NULL);
 
     __sgl_flush_();

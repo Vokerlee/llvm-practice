@@ -29,7 +29,7 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        auto *value = expr_->LLVMGen(ctx);
+        auto *value = ctx.GetBuilder()->CreateZExt(expr_->LLVMGen(ctx), ctx.GetIntTy());
 
         auto func = ctx.GetModule()->getFunction(STDLIB_PRINT_FUNC_NAME);
         if (func == nullptr)
@@ -65,8 +65,8 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        auto *value1 = expr1_->LLVMGen(ctx);
-        auto *value2 = expr2_->LLVMGen(ctx);
+        auto *value1 = ctx.GetBuilder()->CreateZExt(expr1_->LLVMGen(ctx), ctx.GetIntTy());
+        auto *value2 = ctx.GetBuilder()->CreateZExt(expr2_->LLVMGen(ctx), ctx.GetIntTy());
 
         auto func = ctx.GetModule()->getFunction(STDLIB_SGL_INIT_FUNC_NAME);
         if (func == nullptr)
@@ -115,7 +115,7 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        auto *value = expr_->LLVMGen(ctx);
+        auto *value = ctx.GetBuilder()->CreateZExt(expr_->LLVMGen(ctx), ctx.GetIntTy());
 
         auto func = ctx.GetModule()->getFunction(STDLIB_SGL_SRAND_FUNC_NAME);
         if (func == nullptr)

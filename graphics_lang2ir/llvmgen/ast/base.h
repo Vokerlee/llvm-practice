@@ -67,7 +67,7 @@ public:
 
     llvm::Value *LLVMGen(Context &ctx) override
     {
-        lhs_->Store(ctx, rhs_->LLVMGen(ctx));
+        lhs_->Store(ctx, ctx.GetBuilder()->CreateZExt(rhs_->LLVMGen(ctx), ctx.GetIntTy()));
 
         return nullptr;
     }

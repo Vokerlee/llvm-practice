@@ -46,7 +46,7 @@ public:
 
         if (type_->isIntegerTy()) {
             if (init_expr_)
-                ctx.GetBuilder()->CreateStore(init_expr_->LLVMGen(ctx), alloca_);
+                ctx.GetBuilder()->CreateStore(ctx.GetBuilder()->CreateZExt(init_expr_->LLVMGen(ctx), ctx.GetIntTy()), alloca_);
 
             return nullptr;
         } else if (type_->isArrayTy()) {
@@ -107,7 +107,7 @@ public:
 
     void Store(Context &ctx, llvm::Value *value) override
     {
-        ctx.GetBuilder()->CreateStore(value, MakeGEP(ctx));
+        ctx.GetBuilder()->CreateStore(ctx.GetBuilder()->CreateZExt(value, ctx.GetIntTy()), MakeGEP(ctx));
     }
 
 private:

@@ -1,7 +1,7 @@
 %language "c++"
 %skeleton "lalr1.cc"
 
-%locations
+%locations /* actually not necessary here (not used) */
 
 %define parse.trace
 %define parse.lac full
@@ -25,7 +25,8 @@
 %code {
     #include "grammar/driver/driver.h"
 
-    namespace yy {
+    namespace yy
+    {
         parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc, Driver *driver);
     }
 }
@@ -102,7 +103,7 @@ FuncBody            : IS Body END                                       {}
                     | SEMICOLON                                         { driver->func_cur_->MarkAsDecl(); }
 
 RoutineName         : ROUTINE NAME                                      {
-                                                                            driver->MakeGlobalScopeChild();
+                                                                            driver->InheritGlobalScope();
                                                                             $$ = $2;
                                                                         }
 
@@ -156,7 +157,7 @@ Arguments           : Expression                                        { driver
 
 /* Control flow description */
 
-WhileStatement      : WHILE Expression LOOP                             { driver->MakeCurScopeChild(); }
+WhileStatement      : WHILE Expression LOOP                             { driver->InheritCurScope(); }
                       Body END                                          {
                                                                             $$ = std::make_shared<grlang::llvmgen::WhileNode>(
                                                                                 driver->scope_cur_->GetParent(), $2, driver->scope_cur_);
@@ -166,10 +167,10 @@ WhileStatement      : WHILE Expression LOOP                             { driver
 IfStatement         : IF Expression TrueScope END                       { $$ = std::make_shared<grlang::llvmgen::IfNode>(driver->scope_cur_, $2, $3); }
                     | IF Expression TrueScope FalseScope                { $$ = std::make_shared<grlang::llvmgen::IfNode>(driver->scope_cur_, $2, $3, $4); }
 
-TrueScope           : THEN                                              { driver->MakeCurScopeChild(); }
+TrueScope           : THEN                                              { driver->InheritCurScope(); }
                       Body                                              { $$ = driver->scope_cur_; driver->ResetScope(); }
 
-FalseScope          : ELSE                                              { driver->MakeCurScopeChild(); }
+FalseScope          : ELSE                                              { driver->InheritCurScope(); }
                       Body END                                          { $$ = driver->scope_cur_; driver->ResetScope(); }
 
 /* Types description */
