@@ -2,3 +2,7 @@
 	path = graphics_llvm_backend
 	url = https://github.com/Vokerlee/llvm-project-grisc-v
 	branch = grlang_riscv
+[submodule "graphics_riscv_simulator"]
+	path = graphics_riscv_simulator
+	url = https://github.com/Vokerlee/riscv64-simulator
+	branch = griscv_llvm_sim
