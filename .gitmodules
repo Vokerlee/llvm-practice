@@ -1,0 +1,4 @@
+[submodule "graphics_llvm_backend"]
+	path = graphics_llvm_backend
+	url = https://github.com/Vokerlee/llvm-project-grisc-v
+	branch = grlang_riscv
